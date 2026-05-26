@@ -1,0 +1,103 @@
+import { NextResponse } from "next/server";
+import { db } from "@/lib/prisma";
+import { verifyAdmin } from "@/actions/admin";
+import { listAttendanceRecords } from "@/lib/attendance-store";
+import * as XLSX from "xlsx";
+
+function getRangeDates(range, from, to) {
+  let startDate = new Date();
+  let endDate = new Date();
+
+  if (range === "lastweek") {
+    startDate.setDate(startDate.getDate() - 7);
+  } else if (range === "lastmonth") {
+    startDate.setMonth(startDate.getMonth() - 1);
+  } else if (range === "last2months") {
+    startDate.setMonth(startDate.getMonth() - 2);
+  } else if (range === "last3months") {
+    startDate.setMonth(startDate.getMonth() - 3);
+  } else if (range === "custom" && from && to) {
+    startDate = new Date(from);
+    endDate = new Date(to);
+  } else {
+    startDate.setDate(startDate.getDate() - 1);
+  }
+
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
+    throw new Error("Invalid date range");
+  }
+  if (startDate > endDate) {
+    throw new Error("Start date must be before end date");
+  }
+  return { startDate, endDate };
+}
+
+export async function GET(request) {
+  const isAdmin = await verifyAdmin();
+  if (!isAdmin) return new NextResponse("Unauthorized", { status: 401 });
+
+  try {
+    const url = new URL(request.url);
+    const range = url.searchParams.get("range") || "lastmonth";
+    const from = url.searchParams.get("from");
+    const to = url.searchParams.get("to");
+    const { startDate, endDate } = getRangeDates(range, from, to);
+
+    let records = [];
+    if (db.mechanicAttendance) {
+      records = await db.mechanicAttendance.findMany({
+        where: { date: { gte: startDate, lte: endDate } },
+        include: {
+          mechanic: { select: { name: true, email: true, specialty: true } },
+        },
+        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+      });
+    } else {
+      const fallback = listAttendanceRecords({ startDate, endDate });
+      const ids = [...new Set(fallback.map((item) => item.mechanicId))];
+      const mechanics = ids.length
+        ? await db.user.findMany({
+            where: { id: { in: ids } },
+            select: { id: true, name: true, email: true, specialty: true },
+          })
+        : [];
+      const map = new Map(mechanics.map((m) => [m.id, m]));
+      records = fallback.map((item) => ({
+        ...item,
+        mechanic: map.get(item.mechanicId) || null,
+      }));
+    }
+
+    const rows = records.map((r) => ({
+      AttendanceID: r.id || "",
+      MechanicID: r.mechanicId || "",
+      MechanicName: r.mechanic?.name || "",
+      MechanicEmail: r.mechanic?.email || "",
+      Specialty: r.mechanic?.specialty || "",
+      Date: r.date ? new Date(r.date).toISOString().slice(0, 10) : "",
+      Status: r.status || "",
+      Note: r.note || "",
+      MarkedBy: r.markedById || "",
+      CreatedAt: r.createdAt ? new Date(r.createdAt).toISOString() : "",
+      UpdatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : "",
+    }));
+
+    const workbook = XLSX.utils.book_new();
+    const sheet = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(workbook, sheet, "Attendance");
+    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+    return new NextResponse(buffer, {
+      status: 200,
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Disposition": `attachment; filename=attendance-${range}-${Date.now()}.xlsx`,
+      },
+    });
+  } catch (error) {
+    return new NextResponse(error.message || "Failed to export attendance", {
+      status: 400,
+    });
+  }
+}
