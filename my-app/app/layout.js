@@ -23,6 +23,133 @@ export default function RootLayout({ children }) {
      afterSignUpUrl="/onboarding">
     <html lang="en" suppressHydrationWarning >
       <head>
+        {/* <!-- GENERAL SEO --> */}
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vapra Workshop | Expert Auto Repair in Your City</title>
+        <meta name="description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+        <meta name="keywords" content="car repair, garage services, oil change, brake repair, engine diagnostics, tyre replacement, vehicle servicing, auto maintenance" />
+        <meta name="author" content="Vapra Workshop" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://www.vapraworkshop.com" />
+        <meta name="geo.region" content="[Your Region]" />
+        <meta name="geo.placename" content="[Your City]" />
+
+        {/* <!-- FACEBOOK --> */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.vapraworkshop.com" />
+        <meta property="og:title" content="Vapra Workshop | Trusted Auto Repair in Your City" />
+        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+        <meta property="og:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="Vapra Workshop" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="fb:app_id" content="[YOUR_FB_APP_ID]" />
+
+        {/* <!-- INSTAGRAM --> */}
+        {/* og:image should be square friendly (1:1 ratio recommended) */}
+        <meta property="og:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
+        <meta property="og:title" content="Vapra Workshop | Auto Care That Keeps You Moving" />
+        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+
+        {/* <!-- TWITTER / X --> */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@yourtwitterhandle" />
+        <meta name="twitter:creator" content="@yourtwitterhandle" />
+        <meta name="twitter:title" content="Vapra Workshop | Expert Car Repair in Your City" />
+        <meta name="twitter:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+        <meta name="twitter:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
+        <meta name="twitter:image:alt" content="Vapra Workshop preview image showing garage service excellence" />
+
+        {/* <!-- YOUTUBE --> */}
+        {/* Placeholder if you have a YouTube channel: https://www.youtube.com/@YourChannel */}
+        {/* <meta property="og:video" content="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" /> */}
+        <script type="application/ld+json">
+          {`{
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": "Vapra Workshop Service Overview",
+            "description": "A short video overview of our professional garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing.",
+            "thumbnailUrl": "https://www.vapraworkshop.com/images/preview.jpg",
+            "uploadDate": "2026-01-01T08:00:00+00:00",
+            "contentUrl": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
+            "embedUrl": "https://www.youtube.com/embed/YOUR_VIDEO_ID",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Vapra Workshop",
+            }
+          }`}
+        </script>
+
+        {/* <!-- WHATSAPP --> */}
+        {/* Image should be minimum 300x200px for WhatsApp sharing */}
+        <meta property="og:title" content="Your Garage Name | Reliable Garage Services in Your City" />
+        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+        <meta property="og:image" content="https://www.[yourwebsite].com/images/preview.jpg" />
+
+        {/* <!-- LINKEDIN --> */}
+        {/* og:image should be 1200x627px for best LinkedIn sharing */}
+        <meta property="og:title" content="Your Garage Name | Professional Auto Repair in Your City" />
+        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+        <meta property="og:image" content="https://www.[yourwebsite].com/images/preview.jpg" />
+
+        {/* <!-- GOOGLE BUSINESS / LOCAL SEO --> */}
+        <script type="application/ld+json">
+          {`{
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Your Garage Name",
+            "image": "https://www.[yourwebsite].com/images/preview.jpg",
+            "url": "https://www.[yourwebsite].com",
+            "telephone": "[Your Phone Number]",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "[Your Street Address]",
+              "addressLocality": "[Your City]",
+              "addressRegion": "[Your Region]",
+              "postalCode": "[Your Postal Code]",
+              "addressCountry": "[Your Country]"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": "[LATITUDE]",
+              "longitude": "[LONGITUDE]"
+            },
+            "openingHoursSpecification": [
+              {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "opens": "09:00",
+                "closes": "18:00"
+              }
+            ],
+            "sameAs": [
+              "https://www.facebook.com/YourPage",
+              "https://www.instagram.com/YourProfile",
+              "https://twitter.com/YourHandle",
+              "https://www.youtube.com/@YourChannel"
+            ]
+          }`}
+        </script>
+
+        {/* <!-- GENERAL WEBSITE BEST PRACTICES --> */}
+        <meta name="theme-color" content="#0f172a" />
+        <meta name="msapplication-TileColor" content="#0f172a" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       </head>
       <body className={`${inter.className}`}>
