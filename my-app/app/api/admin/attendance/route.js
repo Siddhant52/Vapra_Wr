@@ -7,7 +7,7 @@ import { listAttendanceRecords, upsertAttendanceRecord } from "@/lib/attendance-
 async function verifyAdminAccess() {
   const { userId } = await auth();
   if (!userId) {
-    return {
+    return  {
       error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
       adminUser: null,
     };
