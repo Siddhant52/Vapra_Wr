@@ -27,7 +27,7 @@ async function verifyAdminAccess() {
   if (!hasAdminAccess) {
     return {
       error: NextResponse.json(
-        { error: "Forbidden - Admin access required" },
+        { error: "Forbidden - Admin access required!" },
         { status: 403 }
       ),
       adminUser: null,
