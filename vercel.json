@@ -1,0 +1,7 @@
+{
+  "monorepos": [
+    {
+      "path": "my-app"
+    }
+  ]
+}
