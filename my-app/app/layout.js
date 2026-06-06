@@ -1,250 +1,185 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 
- const inter = Inter({ subsets: ["latin"]});
+const inter = Inter({ subsets: ["latin"] });
+
 export const metadata = {
-  title: "Vapra Workshop",
-  description: "Connect with us Anytime, Anywhere!",
+  title: "Vapra Workshop | Expert Auto Repair in Bikaner",
+  description:
+    "Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing in Bikaner, Rajasthan.",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider 
-     appearance={{
-      baseTheme: dark,
-     }}
-     signInUrl="/sign-in"
-     signUpUrl="/sign-up"
-     afterSignInUrl="/onboarding"
-     afterSignUpUrl="/onboarding">
-    <html lang="en" suppressHydrationWarning >
-      <head>
-        {/* <!-- GENERAL SEO --> */}
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Vapra Workshop | Expert Auto Repair in Your City</title>
-        <meta name="description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
-        <meta name="keywords" content="car repair, garage services, oil change, brake repair, engine diagnostics, tyre replacement, vehicle servicing, auto maintenance" />
-        <meta name="author" content="Vapra Workshop" />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://www.vapraworkshop.com" />
-        <meta name="geo.region" content="[Your Region]" />
-        <meta name="geo.placename" content="[Your City]" />
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+      }}
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      afterSignInUrl="/onboarding"
+      afterSignUpUrl="/onboarding"
+    >
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <meta charSet="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta name="description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing in Bikaner, Rajasthan." />
+          <meta name="keywords" content="car repair Bikaner, garage services Bikaner, oil change, brake repair, engine diagnostics, tyre replacement, vehicle servicing, auto maintenance Rajasthan" />
+          <meta name="author" content="Vapra Workshop" />
+          <meta name="robots" content="index, follow" />
+          <link rel="canonical" href="https://www.vapraworkshop.com" />
+          <meta name="geo.region" content="IN-RJ" />
+          <meta name="geo.placename" content="Bikaner" />
 
-        {/* <!-- FACEBOOK --> */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.vapraworkshop.com" />
-        <meta property="og:title" content="Vapra Workshop | Trusted Auto Repair in Your City" />
-        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
-        <meta property="og:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:site_name" content="Vapra Workshop" />
-        <meta property="og:locale" content="en_US" />
-        <meta property="fb:app_id" content="[YOUR_FB_APP_ID]" />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://www.vapraworkshop.com" />
+          <meta property="og:title" content="Vapra Workshop | Trusted Auto Repair in Bikaner" />
+          <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+          <meta property="og:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:site_name" content="Vapra Workshop" />
+          <meta property="og:locale" content="en_IN" />
 
-        {/* <!-- INSTAGRAM --> */}
-        {/* og:image should be square friendly (1:1 ratio recommended) */}
-        <meta property="og:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
-        <meta property="og:title" content="Vapra Workshop | Auto Care That Keeps You Moving" />
-        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:site" content="@VapraWorkshop" />
+          <meta name="twitter:creator" content="@VapraWorkshop" />
+          <meta name="twitter:title" content="Vapra Workshop | Expert Car Repair in Bikaner" />
+          <meta name="twitter:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
+          <meta name="twitter:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
+          <meta name="twitter:image:alt" content="Vapra Workshop - Professional Auto Repair Services in Bikaner" />
 
-        {/* <!-- TWITTER / X --> */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@yourtwitterhandle" />
-        <meta name="twitter:creator" content="@yourtwitterhandle" />
-        <meta name="twitter:title" content="Vapra Workshop | Expert Car Repair in Your City" />
-        <meta name="twitter:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
-        <meta name="twitter:image" content="https://www.vapraworkshop.com/images/preview.jpg" />
-        <meta name="twitter:image:alt" content="Vapra Workshop preview image showing garage service excellence" />
-
-        {/* <!-- YOUTUBE --> */}
-        {/* Placeholder if you have a YouTube channel: https://www.youtube.com/@YourChannel */}
-        {/* <meta property="og:video" content="https://www.youtube.com/watch?v=YOUR_VIDEO_ID" /> */}
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "VideoObject",
-            "name": "Vapra Workshop Service Overview",
-            "description": "A short video overview of our professional garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing.",
-            "thumbnailUrl": "https://www.vapraworkshop.com/images/preview.jpg",
-            "uploadDate": "2026-01-01T08:00:00+00:00",
-            "contentUrl": "https://www.youtube.com/watch?v=YOUR_VIDEO_ID",
-            "embedUrl": "https://www.youtube.com/embed/YOUR_VIDEO_ID",
-            "publisher": {
-              "@type": "Organization",
-              "name": "Vapra Workshop",
-            }
-          }`}
-        </script>
-
-        {/* <!-- WHATSAPP --> */}
-        {/* Image should be minimum 300x200px for WhatsApp sharing */}
-        <meta property="og:title" content="Your Garage Name | Reliable Garage Services in Your City" />
-        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
-        <meta property="og:image" content="https://www.[yourwebsite].com/images/preview.jpg" />
-
-        {/* <!-- LINKEDIN --> */}
-        {/* og:image should be 1200x627px for best LinkedIn sharing */}
-        <meta property="og:title" content="Your Garage Name | Professional Auto Repair in Your City" />
-        <meta property="og:description" content="Expert car repair and garage services including oil change, brake repair, engine diagnostics, tyre replacement and general servicing." />
-        <meta property="og:image" content="https://www.[yourwebsite].com/images/preview.jpg" />
-
-        {/* <!-- GOOGLE BUSINESS / LOCAL SEO --> */}
-        <script type="application/ld+json">
-          {`{
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            "name": "Your Garage Name",
-            "image": "https://www.[yourwebsite].com/images/preview.jpg",
-            "url": "https://www.[yourwebsite].com",
-            "telephone": "[Your Phone Number]",
-            "address": {
-              "@type": "PostalAddress",
-              "streetAddress": "[Your Street Address]",
-              "addressLocality": "[Your City]",
-              "addressRegion": "[Your Region]",
-              "postalCode": "[Your Postal Code]",
-              "addressCountry": "[Your Country]"
-            },
-            "geo": {
-              "@type": "GeoCoordinates",
-              "latitude": "[LATITUDE]",
-              "longitude": "[LONGITUDE]"
-            },
-            "openingHoursSpecification": [
-              {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday"
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "AutoRepair",
+                name: "Vapra Workshop",
+                image: "https://www.vapraworkshop.com/images/preview.jpg",
+                url: "https://www.vapraworkshop.com",
+                telephone: "08460199154",
+                address: {
+                  "@type": "PostalAddress",
+                  streetAddress: "Old Chungi Chowki, Gajner Road",
+                  addressLocality: "Bikaner",
+                  addressRegion: "Rajasthan",
+                  postalCode: "334002",
+                  addressCountry: "IN",
+                },
+                geo: {
+                  "@type": "GeoCoordinates",
+                  latitude: "28.022544",
+                  longitude: "73.311083",
+                },
+                openingHoursSpecification: [
+                  {
+                    "@type": "OpeningHoursSpecification",
+                    dayOfWeek: ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+                    opens: "09:00",
+                    closes: "18:00",
+                  },
                 ],
-                "opens": "09:00",
-                "closes": "18:00"
-              }
-            ],
-            "sameAs": [
-              "https://www.facebook.com/YourPage",
-              "https://www.instagram.com/YourProfile",
-              "https://twitter.com/YourHandle",
-              "https://www.youtube.com/@YourChannel"
-            ]
-          }`}
-        </script>
+                sameAs: [
+                  "https://www.facebook.com/share/18GGSfqFTn/",
+                  "https://www.instagram.com/wapra_workshop_bkn/",
+                  "https://youtube.com/@ashokdevra2986",
+                ],
+              }),
+            }}
+          />
 
-        {/* <!-- GENERAL WEBSITE BEST PRACTICES --> */}
-        <meta name="theme-color" content="#0f172a" />
-        <meta name="msapplication-TileColor" content="#0f172a" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-      </head>
-      <body className={`${inter.className}`}>
-         <ThemeProvider
+          <meta name="theme-color" content="#0f172a" />
+          <meta name="msapplication-TileColor" content="#0f172a" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <script src="https://checkout.razorpay.com/v1/checkout.js" />
+        </head>
+        <body className={`${inter.className}`}>
+          <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
-             {/* header */}
-             <Header />
-
-<main className="min-h-screen pt-24">
-          {children}
-        </main>
-
-        {/* footer */}
-        <footer className="bg-gray-900 text-gray-100 py-16 border-t border-gray-800">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {/* About */}
-              <div>
-                <h3 className="text-xl font-bold text-emerald-400 mb-4">Vapra Workshop</h3>
-                <p className="text-gray-400 mb-4">
-                  Your trusted automotive service center providing professional vehicle maintenance and repair solutions.
-                </p>
-                <div className="flex gap-4">
-                  <a href="https://www.facebook.com/share/18GGSfqFTn/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                  </a>
-                  <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 002.856-3.915 9.953 9.953 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                  </a>
-                  <a href="https://www.instagram.com/wapra_workshop_bkn/?hl=en" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37Z" fill="none" stroke="currentColor" strokeWidth="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
-                  </a>
-                  <a href="https://youtube.com/@ashokdevra2986?si=r55B1UqIAFMr4kDR" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                  </a>
-                </div>
-              </div>
-
-              {/* Contact Info */}
-              <div>
-                <h3 className="text-xl font-bold text-emerald-400 mb-4">Contact Us</h3>
-                <div className="space-y-3 text-gray-400">
+            <Header />
+            <main className="min-h-screen pt-24">{children}</main>
+            <footer className="bg-gray-900 text-gray-100 py-16 border-t border-gray-800">
+              <div className="container mx-auto px-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                   <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <a href="tel:08460199154" className="hover:text-emerald-400 transition font-semibold">
-                      08460199154
+                    <h3 className="text-xl font-bold text-emerald-400 mb-4">Vapra Workshop</h3>
+                    <p className="text-gray-400 mb-4">
+                      Your trusted automotive service center providing professional vehicle maintenance and repair solutions.
+                    </p>
+                    <div className="flex gap-4">
+                      <a href="https://www.facebook.com/share/18GGSfqFTn/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                      </a>
+                      <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 002.856-3.915 9.953 9.953 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                      </a>
+                      <a href="https://www.instagram.com/wapra_workshop_bkn/?hl=en" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37Z" fill="none" stroke="currentColor" strokeWidth="2"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+                      </a>
+                      <a href="https://youtube.com/@ashokdevra2986?si=r55B1UqIAFMr4kDR" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-emerald-400 transition">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                      </a>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-emerald-400 mb-4">Contact Us</h3>
+                    <div className="space-y-3 text-gray-400">
+                      <div>
+                        <p className="text-sm text-gray-500">Phone</p>
+                        <a href="tel:08460199154" className="hover:text-emerald-400 transition font-semibold">08460199154</a>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Location</p>
+                        <p>Old Chungi Chowki, Gajner Road<br/>Bikaner, Rajasthan 334002</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Hours</p>
+                        <p>Mon - Sun: 9:00 AM - 6:00 PM</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-emerald-400 mb-4">Location</h3>
+                    <div className="rounded-lg overflow-hidden h-48">
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3556.8678308235564!2d73.31108331508722!3d28.02254418820929!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3910be78780c65fb%3A0x66fe3d3cd4873c1c!2sJaisalmer%20Rd%2C%20opp.%20Masid%2C%20Chungi%20Chowki%2C%20Nathusar%20Bass%2C%20Bikaner%2C%20Rajasthan%20334001!5e0!3m2!1sen!2sin!4v1700000000000"
+                        width="100%"
+                        height="100%"
+                        style={{ border: 0 }}
+                        allowFullScreen=""
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+                <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+                  <p>© 2026 Vapra Workshop. All rights reserved.</p>
+                  <p className="mt-2">
+                    <a href="https://jsdl.in/DT-992EII6Q62E" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition">
+                      Visit our Google Map
                     </a>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Location</p>
-                    <p>Old Chungi Chowki, Gajner Road<br/>Bikaner, Rajasthan 334002</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Hours</p>
-                    <p>Mon - Sun: 9:00 AM - 6:00 PM</p>
-                  </div>
+                  </p>
                 </div>
               </div>
-
-              {/* Map */}
-              <div>
-                <h3 className="text-xl font-bold text-emerald-400 mb-4">Location</h3>
-                <div className="rounded-lg overflow-hidden h-48">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3556.8678308235564!2d73.31108331508722!3d28.02254418820929!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3910be78780c65fb%3A0x66fe3d3cd4873c1c!2sJaisalmer%20Rd%2C%20opp.%20Masid%2C%20Chungi%20Chowki%2C%20Nathusar%20Bass%2C%20Bikaner%2C%20Rajasthan%20334001!5e0!3m2!1sen!2sin!4v1700000000000"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  ></iframe>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Divider and Copyright */}
-            <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-              <p>© 2026 Vapra Workshop. All rights reserved.</p>
-              <p className="mt-2">
-                <a href="https://jsdl.in/DT-992EII6Q62E" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition">
-                  Visit our Google Map
-                </a>
-              </p>
-            </div>
-          </div>
-        </footer>
+            </footer>
           </ThemeProvider>
-       
-         </body>
-    </html>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
