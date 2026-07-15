@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/page-header";
 
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState(null);
+  const [statusMessage, setStatusMessage] = useState("");
   const router = useRouter();
 
   const packages = [
@@ -66,49 +67,88 @@ export default function PricingPage() {
     router.push("/onboarding");
   };
 
-  const handleCheckout = async (planId) => {
-    setLoadingPlan(planId);
+  const handleCheckout = async (pkg) => {
+    setLoadingPlan(pkg.id);
+    setStatusMessage("");
 
     try {
-      const response = await fetch("/api/checkout", {
+      const publicKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "";
+      if (!publicKey) {
+        throw new Error("Razorpay public key is missing. Add NEXT_PUBLIC_RAZORPAY_KEY_ID to your environment.");
+      }
+
+      const response = await fetch("/api/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planId }),
+        body: JSON.stringify({
+          amount: pkg.priceAmount,
+          currency: "INR",
+          receipt: `receipt_${pkg.id}_${Date.now()}`,
+        }),
       });
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
-        throw new Error(data?.message || "Unable to start checkout. Please sign in or try again.");
+        const message = data?.message || "Unable to start checkout. Please try again.";
+
+        if (response.status === 401 || /authentication/i.test(message)) {
+          throw new Error(
+            "Razorpay authentication failed. Update the Razorpay API credentials in the server environment before trying again."
+          );
+        }
+
+        throw new Error(message);
       }
 
       const data = await response.json();
-
-      // Initialize Razorpay checkout
       const options = {
-        key: data.key,
+        key: publicKey,
         amount: data.amount,
         currency: data.currency,
-        order_id: data.orderId,
+        order_id: data.order_id,
         name: "Vapra Workshop",
-        description: data.planName,
-        handler: function (response) {
-          // Payment successful - redirect to success page
-          window.location.href = "/checkout/success";
+        description: pkg.name,
+        handler: async function (response) {
+          try {
+            const verifyResponse = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(response),
+            });
+            const verifyData = await verifyResponse.json().catch(() => null);
+
+            if (!verifyResponse.ok || !verifyData?.success) {
+              throw new Error(verifyData?.message || "Payment verification failed.");
+            }
+
+            window.location.href = "/checkout/success";
+          } catch (error) {
+            console.error(error);
+            setStatusMessage(error.message || "Payment verification failed.");
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setStatusMessage("Payment cancelled. No charges were made.");
+          },
         },
         prefill: {
-          name: "", // Will be filled by Clerk user data
-          email: "", // Will be filled by Clerk user data
+          name: "",
+          email: "",
         },
         theme: {
-          color: "#10b981", // emerald-500
+          color: "#10b981",
         },
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response) {
+        setStatusMessage(response.error?.description || "Payment failed. Please try again.");
+      });
       rzp.open();
     } catch (error) {
       console.error(error);
-      alert(error.message || "Something went wrong while starting checkout.");
+      setStatusMessage(error.message || "Something went wrong while starting checkout.");
     } finally {
       setLoadingPlan(null);
     }
@@ -121,8 +161,14 @@ export default function PricingPage() {
         description="Transparent pricing for quality automotive services at Vapra Workshop"
       />
       <div className="text-xs sm:text-sm text-emerald-300 mb-4 md:mb-6 max-w-2xl">
-        Secure payment checkout is available through Clerk-powered payment flows for customers who sign in before purchase.
+        Secure Razorpay Standard Checkout is available for customers who sign in before purchase.
       </div>
+
+      {statusMessage ? (
+        <div className="rounded-lg border border-emerald-600/30 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200">
+          {statusMessage}
+        </div>
+      ) : null}
 
       {/* Pricing Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch">
@@ -163,7 +209,7 @@ export default function PricingPage() {
 
               <div className="space-y-2 sm:space-y-3">
                 <Button
-                  onClick={() => handleCheckout(pkg.id)}
+                  onClick={() => handleCheckout(pkg)}
                   className={`w-full text-sm sm:text-base h-9 sm:h-10 ${
                     pkg.popular
                       ? "bg-emerald-600 hover:bg-emerald-700"
@@ -171,7 +217,7 @@ export default function PricingPage() {
                   }`}
                   disabled={loadingPlan === pkg.id}
                 >
-                  {loadingPlan === pkg.id ? "Starting checkout..." : `Pay with Clerk`}
+                  {loadingPlan === pkg.id ? "Starting checkout..." : "Pay with Razorpay"}
                 </Button>
                 <Button
                   onClick={handleBooking}
