@@ -21,9 +21,13 @@ export const metadata = {
     canonical: SITE_URL,
   },
   icons: {
-    icon: [{ url: "/logo-single2.png", type: "image/png" }],
-    shortcut: "/logo-single2.png",
-    apple: "/logo-single2.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon-32x32.png",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
@@ -103,8 +107,11 @@ export default function RootLayout({ children }) {
           <meta name="msapplication-TileColor" content="#0f172a" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          <link rel="icon" href="/logo-single2.png" type="image/png" />
-          <link rel="apple-touch-icon" href="/logo-single2.png" />
+          <link rel="icon" href="/favicon.ico" sizes="any" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+          <link rel="shortcut icon" href="/favicon-32x32.png" />
         </head>
         <body className={`${inter.className}`}>
           <ThemeProvider
