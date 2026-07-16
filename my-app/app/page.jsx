@@ -66,7 +66,7 @@ export default async function Home() {
                   <Button
                     asChild
                     size="lg"
-                    className="bg-orange-600 text-white hover:bg-orange-700 h-10 md:h-11 text-sm md:text-base"
+                    className="bg-orange-700 text-white hover:bg-orange-800 h-10 md:h-11 text-sm md:text-base"
                   >
                     <Link href={primaryHref}>
                       {primaryLabel} <ArrowRight className="ml-2 h-3 md:h-4 w-3 md:w-4" />
@@ -162,22 +162,22 @@ export default async function Home() {
                 }`}
               >
                 {plan.popular && (
-                  <Badge className="self-start bg-emerald-600 text-white px-2 md:px-3 py-1 mb-3 text-xs md:text-sm">
+                  <Badge className="self-start bg-emerald-700 text-white px-2 md:px-3 py-1 mb-3 text-xs md:text-sm">
                     Most Popular
                   </Badge>
                 )}
 
                 <CardHeader className="pb-2 md:pb-3">
                   <CardTitle className="text-base md:text-lg text-white">{plan.name}</CardTitle>
-                  <CardDescription className="text-xs md:text-sm">{plan.description}</CardDescription>
+                  <CardDescription className="text-xs md:text-sm text-gray-300">{plan.description}</CardDescription>
                   <div className="mt-3 md:mt-4">
-                    <p className="text-2xl md:text-3xl font-bold text-emerald-400">{plan.price}</p>
+                    <p className="text-2xl md:text-3xl font-bold text-emerald-300">{plan.price}</p>
                   </div>
                 </CardHeader>
                 <CardContent className="flex flex-col justify-between space-y-4 md:space-y-6 flex-grow">
                   <ul className="space-y-1.5 md:space-y-2">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground">
+                      <li key={index} className="flex items-start gap-2 text-xs md:text-sm text-gray-300">
                         <Check className="mt-0.5 h-3 md:h-4 w-3 md:w-4 text-emerald-400 flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
@@ -187,11 +187,7 @@ export default async function Home() {
                   <Button
                     asChild
                     size="sm"
-                    className={`${
-                      plan.popular
-                        ? "bg-emerald-600 hover:bg-emerald-700"
-                        : "bg-emerald-600/80 hover:bg-emerald-600"
-                    } h-9 md:h-10 text-xs md:text-sm`}
+                    className="bg-emerald-700 text-white hover:bg-emerald-800 h-9 md:h-10 text-xs md:text-sm"
                   >
                     <Link href="/pricing">Checkout via Clerk</Link>
                   </Button>
@@ -259,9 +255,9 @@ export default async function Home() {
                         </span>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-sm md:text-base text-white">
+                        <h3 className="font-semibold text-sm md:text-base text-white">
                           {testimonial.name}
-                        </h4>
+                        </h3>
                         <p className="text-xs md:text-sm text-muted-foreground">
                           {testimonial.role}
                         </p>
@@ -295,7 +291,7 @@ export default async function Home() {
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                   <Button
                     size="lg"
-                    className="bg-orange-600 text-white hover:bg-orange-700 h-10 md:h-11 text-sm md:text-base"
+                    className="bg-orange-700 text-white hover:bg-orange-800 h-10 md:h-11 text-sm md:text-base"
                     asChild
                   >
                     <Link href="/sign-up">Sign-up Now</Link>

@@ -28,6 +28,9 @@ function SignedOutActions() {
   );
 }
 
+const adminBtnClass =
+  "h-7 border-emerald-400 px-2 py-1 text-xs text-emerald-100 hover:border-emerald-300 hover:bg-emerald-500/10 md:h-9 md:px-3 md:text-sm";
+
 export async function HeaderAuthServer() {
   let userId = null;
 
@@ -35,8 +38,6 @@ export async function HeaderAuthServer() {
     const session = await auth();
     userId = session?.userId ?? null;
   } catch {
-    // auth() throws when clerkMiddleware did not run (e.g. static asset 404s).
-    // Fall back to signed-out UI instead of crashing the page.
     return <SignedOutActions />;
   }
 
@@ -54,27 +55,29 @@ export async function HeaderAuthServer() {
   const email =
     user?.primaryEmailAddress?.emailAddress ||
     user?.emailAddresses?.[0]?.emailAddress;
-  const allowListed = isAllowedAdminEmail(email);
+  const isAdmin = isAllowedAdminEmail(email);
 
   return (
-    <div className="flex items-center gap-1">
-      {allowListed && (
-        <Link href="/admin" className="hidden sm:inline-flex">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 border-emerald-400 px-2 py-1 text-xs text-emerald-100 hover:border-emerald-300 hover:bg-emerald-500/10 md:h-9 md:px-3 md:text-sm"
-            aria-label="Go to admin dashboard"
-          >
-            Admin
-          </Button>
-        </Link>
+    <div className="flex items-center gap-1 md:gap-2">
+      {isAdmin && (
+        <>
+          <Link href="/admin" className="inline-flex">
+            <Button variant="outline" size="sm" className={adminBtnClass} aria-label="Admin dashboard">
+              Dashboard
+            </Button>
+          </Link>
+          <Link href="/admin/manage" className="inline-flex">
+            <Button variant="outline" size="sm" className={adminBtnClass} aria-label="Admin manage">
+              Manage
+            </Button>
+          </Link>
+        </>
       )}
 
       <Link
-        href="/booking-status"
+        href={isAdmin ? "/admin" : "/booking-status"}
         className="flex items-center"
-        aria-label="Account and bookings"
+        aria-label={isAdmin ? "Admin account" : "Account and bookings"}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -84,6 +87,16 @@ export async function HeaderAuthServer() {
           width={40}
           height={40}
         />
+      </Link>
+
+      <Link href="/sign-out" className="hidden sm:inline-flex">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 py-1 text-xs text-gray-300 hover:text-white md:h-9 md:px-3 md:text-sm"
+        >
+          Sign Out
+        </Button>
       </Link>
     </div>
   );

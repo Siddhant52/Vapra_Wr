@@ -8,6 +8,7 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   preload: true,
+  adjustFontFallback: true,
 });
 
 const SITE_URL = "https://vapraworkshop.com";
@@ -127,7 +128,7 @@ export default function RootLayout({ children }) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                   <div>
                     <h3 className="text-xl font-bold text-emerald-400 mb-4">Vapra Workshop</h3>
-                    <p className="text-gray-400 mb-4">
+                    <p className="text-gray-300 mb-4">
                       Your trusted automotive service center providing professional vehicle maintenance and repair solutions.
                     </p>
                     <div className="flex gap-4">
@@ -147,18 +148,18 @@ export default function RootLayout({ children }) {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-emerald-400 mb-4">Contact Us</h3>
-                    <div className="space-y-3 text-gray-400">
+      <div className="space-y-3 text-gray-300">
                       <div>
-                        <p className="text-sm text-gray-500">Phone</p>
-                        <a href="tel:+917062416273" className="hover:text-emerald-400 transition font-semibold">+91-7062416273</a>
+                        <p className="text-sm font-medium text-gray-200">Phone</p>
+                        <a href="tel:+917062416273" className="font-semibold text-gray-100 hover:text-emerald-400 transition">+91-7062416273</a>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Location</p>
-                        <p>Chungi Chowki, Gajner road, Antyodaya Nagar<br/>Bikaner, Rajasthan 334001</p>
+                        <p className="text-sm font-medium text-gray-200">Location</p>
+                        <p className="text-gray-300">Chungi Chowki, Gajner road, Antyodaya Nagar<br/>Bikaner, Rajasthan 334001</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-500">Hours</p>
-                        <p>Mon - Sun: 9:00 AM - 6:00 PM</p>
+                        <p className="text-sm font-medium text-gray-200">Hours</p>
+                        <p className="text-gray-300">Mon - Sun: 9:00 AM - 6:00 PM</p>
                       </div>
                     </div>
                   </div>
@@ -167,7 +168,7 @@ export default function RootLayout({ children }) {
                     <FooterMap />
                   </div>
                 </div>
-                <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+                <div className="border-t border-gray-800 pt-8 text-center text-gray-300 text-sm">
                   <p>© 2026 Vapra Workshop. All rights reserved.</p>
                   <p className="mt-2">
                     <a

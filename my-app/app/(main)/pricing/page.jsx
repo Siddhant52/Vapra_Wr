@@ -186,7 +186,7 @@ export default function PricingPage() {
           >
             {pkg.popular && (
               <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <Badge className="bg-emerald-600 hover:bg-emerald-700 text-xs sm:text-sm">
+                <Badge className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm">
                   Most Popular
                 </Badge>
               </div>
@@ -213,11 +213,7 @@ export default function PricingPage() {
               <div className="space-y-2 sm:space-y-3">
                 <Button
                   onClick={() => handleCheckout(pkg)}
-                  className={`w-full text-sm sm:text-base h-9 sm:h-10 ${
-                    pkg.popular
-                      ? "bg-emerald-600 hover:bg-emerald-700"
-                      : "bg-emerald-600/80 hover:bg-emerald-600"
-                  }`}
+                  className="w-full bg-emerald-700 text-white hover:bg-emerald-800 text-sm sm:text-base h-9 sm:h-10"
                   disabled={loadingPlan === pkg.id}
                 >
                   {loadingPlan === pkg.id ? "Starting checkout..." : "Pay with Razorpay"}
@@ -245,25 +241,25 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <h4 className="font-semibold text-sm sm:text-base text-white mb-2">Expert Technicians</h4>
-              <p className="text-xs sm:text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-300">
                 Our certified mechanics have years of experience servicing all vehicle types and brands.
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm sm:text-base text-white mb-2">Quality Guarantee</h4>
-              <p className="text-xs sm:text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-300">
                 All services backed by our satisfaction guarantee and warranty coverage.
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm sm:text-base text-white mb-2">Transparent Pricing</h4>
-              <p className="text-xs sm:text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-300">
                 No hidden fees. Get upfront quotes before any work begins.
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-sm sm:text-base text-white mb-2">Fast Turnaround</h4>
-              <p className="text-xs sm:text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-300">
                 Quick service without compromising on quality. Most jobs completed same day.
               </p>
             </div>
@@ -274,13 +270,13 @@ export default function PricingPage() {
       {/* CTA Section */}
       <div className="bg-emerald-900/20 border border-emerald-600/20 rounded-lg p-6 sm:p-8 text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Ready to Book Your Service?</h2>
-        <p className="text-xs sm:text-base text-gray-400 mb-4 sm:mb-6">
+        <p className="text-xs sm:text-base text-gray-300 mb-4 sm:mb-6">
           Browse our services by category and schedule your appointment today
         </p>
         <Button
           size="lg"
           onClick={handleBooking}
-          className="bg-emerald-600 hover:bg-emerald-700 h-9 sm:h-11 text-sm sm:text-base"
+          className="bg-emerald-700 text-white hover:bg-emerald-800 h-9 sm:h-11 text-sm sm:text-base"
         >
           Browse All Services
         </Button>

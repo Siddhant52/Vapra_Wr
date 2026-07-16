@@ -38,7 +38,7 @@ export default function TrackAppointmentButton({
     <Button
       asChild
       size="lg"
-      className="bg-orange-600 text-white hover:bg-orange-700"
+      className="bg-orange-700 text-white hover:bg-orange-800"
       onClick={handleClick}
     >
       <Link href={href}>{children}</Link>
