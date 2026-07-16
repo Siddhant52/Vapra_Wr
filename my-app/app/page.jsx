@@ -10,15 +10,24 @@ import {
 import { creditBenefits, features, testimonials, servicePlans } from "@/lib/data";
 import { ArrowRight, Check, Wrench } from "lucide-react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/actions/onboarding";
 import TrackAppointmentButton from "@/components/track-appointment-button";
+import SliderBanner from "@/components/slider-banner";
 
-const SliderBanner = dynamic(() => import("@/components/slider-banner"), {
-  loading: () => (
-    <div className="aspect-[4/3] w-full animate-pulse rounded-lg bg-muted/30" />
-  ),
-});
+const HERO_IMAGES = [
+  "vapra1.jpeg",
+  "vapra2.jpeg",
+  "vapra3.jpeg",
+  "vapra4.jpeg",
+  "vapra5jpeg.jpeg",
+  "vapra6.jpeg",
+  "vapra7.jpeg",
+  "vapra8.jpeg",
+  "vapra9.jpeg",
+  "vapra10.jpeg",
+  "vapra11.jpeg",
+  "vapra12.jpeg",
+];
 
 export default async function Home() {
   const user = await getCurrentUser();
@@ -80,20 +89,7 @@ export default async function Home() {
               </div>
             </div>
             <SliderBanner
-              images={[
-                "vapra1.jpeg",
-                "vapra2.jpeg",
-                "vapra3.jpeg",
-                "vapra4.jpeg",
-                "vapra5.jpeg",
-                "vapra6.jpeg",
-                "vapra7.jpeg",
-                "vapra8.jpeg",
-                "vapra9.jpeg",
-                "vapra10.jpeg",
-                "vapra11.jpeg",
-                "vapra12.jpeg",
-              ]}
+              images={HERO_IMAGES}
               interval={4200}
               alt="Vapra workshop"
             />

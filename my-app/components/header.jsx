@@ -24,10 +24,12 @@ export default function Header({ authSlot }) {
         <Link href="/" className="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
           <Image
             src="/logo-single2.png"
-            alt="vapra-logo"
-            width={200}
-            height={60}
-            className="h-8 md:h-10 w-auto object-contain"
+            alt="Vapra Workshop logo"
+            width={160}
+            height={48}
+            priority
+            className="h-8 w-auto md:h-10"
+            style={{ width: "auto", height: "auto", maxHeight: "2.5rem" }}
           />
           <span className="text-sm md:text-lg font-semibold tracking-wide bg-linear-to-r from-emerald-400 via-orange-400 to-emerald-400 bg-clip-text text-transparent shadow-sm">
             Vapra Workshop
@@ -55,8 +57,10 @@ export default function Header({ authSlot }) {
             size="icon"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="ml-2"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </Button>
         </div>
 
