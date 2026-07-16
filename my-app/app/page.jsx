@@ -2,7 +2,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardHeader,
   CardTitle,
@@ -10,11 +9,16 @@ import {
 } from "@/components/ui/card";
 import { creditBenefits, features, testimonials, servicePlans } from "@/lib/data";
 import { ArrowRight, Check, Wrench } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { getCurrentUser } from "@/actions/onboarding";
 import TrackAppointmentButton from "@/components/track-appointment-button";
-import SliderBanner from "@/components/slider-banner";
+
+const SliderBanner = dynamic(() => import("@/components/slider-banner"), {
+  loading: () => (
+    <div className="aspect-[4/3] w-full animate-pulse rounded-lg bg-muted/30" />
+  ),
+});
 
 export default async function Home() {
   const user = await getCurrentUser();

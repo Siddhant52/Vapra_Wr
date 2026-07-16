@@ -3,11 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { HeaderAuth } from "./header-auth";
 import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
 
-export default function Header() {
+export default function Header({ authSlot }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -50,7 +49,7 @@ export default function Header() {
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-2 lg:hidden">
-          <HeaderAuth />
+          {authSlot}
           <Button
             variant="ghost"
             size="icon"
@@ -63,7 +62,7 @@ export default function Header() {
 
         {/* Desktop Auth */}
         <div className="hidden lg:block">
-          <HeaderAuth />
+          {authSlot}
         </div>
       </nav>
 

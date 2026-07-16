@@ -1,9 +1,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/header";
-import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { HeaderShell } from "@/components/header-shell";
+import { FooterMap } from "@/components/footer-map";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,16 +14,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: dark,
-      }}
-      signInUrl="/sign-in"
-      signUpUrl="/sign-up"
-      afterSignInUrl="/onboarding"
-      afterSignUpUrl="/onboarding"
-    >
-      <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
         <head>
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -63,13 +53,13 @@ export default function RootLayout({ children }) {
                 name: "Vapra Workshop",
                 image: "https://www.vapraworkshop.com/images/preview.jpg",
                 url: "https://www.vapraworkshop.com",
-                telephone: "08460199154",
+                telephone: "+91-7062416273",
                 address: {
                   "@type": "PostalAddress",
-                  streetAddress: "Old Chungi Chowki, Gajner Road",
+                  streetAddress: "Chungi Chowki, Gajner road, Antyodaya Nagar",
                   addressLocality: "Bikaner",
                   addressRegion: "Rajasthan",
-                  postalCode: "334002",
+                  postalCode: "334001",
                   addressCountry: "IN",
                 },
                 geo: {
@@ -101,7 +91,6 @@ export default function RootLayout({ children }) {
           <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-          <script src="https://checkout.razorpay.com/v1/checkout.js" />
         </head>
         <body className={`${inter.className}`}>
           <ThemeProvider
@@ -110,7 +99,7 @@ export default function RootLayout({ children }) {
             enableSystem
             disableTransitionOnChange
           >
-            <Header />
+            <HeaderShell />
             <main className="min-h-screen pt-24">{children}</main>
             <footer className="bg-gray-900 text-gray-100 py-16 border-t border-gray-800">
               <div className="container mx-auto px-4">
@@ -140,11 +129,11 @@ export default function RootLayout({ children }) {
                     <div className="space-y-3 text-gray-400">
                       <div>
                         <p className="text-sm text-gray-500">Phone</p>
-                        <a href="tel:08460199154" className="hover:text-emerald-400 transition font-semibold">08460199154</a>
+                        <a href="tel:+917062416273" className="hover:text-emerald-400 transition font-semibold">+91-7062416273</a>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Location</p>
-                        <p>Old Chungi Chowki, Gajner Road<br/>Bikaner, Rajasthan 334002</p>
+                        <p>Chungi Chowki, Gajner road, Antyodaya Nagar<br/>Bikaner, Rajasthan 334001</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Hours</p>
@@ -154,24 +143,28 @@ export default function RootLayout({ children }) {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-emerald-400 mb-4">Location</h3>
-                    <div className="rounded-lg overflow-hidden h-48">
-                      <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3556.8678308235564!2d73.31108331508722!3d28.02254418820929!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3910be78780c65fb%3A0x66fe3d3cd4873c1c!2sJaisalmer%20Rd%2C%20opp.%20Masid%2C%20Chungi%20Chowki%2C%20Nathusar%20Bass%2C%20Bikaner%2C%20Rajasthan%20334001!5e0!3m2!1sen!2sin!4v1700000000000"
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0 }}
-                        allowFullScreen=""
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      ></iframe>
-                    </div>
+                    <FooterMap />
                   </div>
                 </div>
                 <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
                   <p>© 2026 Vapra Workshop. All rights reserved.</p>
                   <p className="mt-2">
-                    <a href="https://jsdl.in/DT-992EII6Q62E" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 transition">
-                      Visit our Google Map
+                    <a
+                      href="https://www.google.com/maps/dir/?api=1&destination=Vapra+Workshop%2C+Chungi+Chowki%2C+Gajner+road%2C+Antyodaya+Nagar%2C+Bikaner%2C+Rajasthan+334001&travelmode=driving"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 hover:text-emerald-300 transition"
+                    >
+                      Get directions on Google Maps
+                    </a>
+                    {" · "}
+                    <a
+                      href="https://maps.app.goo.gl/Sr5k5xMac6BeWcxJ6"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-400 hover:text-emerald-300 transition"
+                    >
+                      View location
                     </a>
                   </p>
                 </div>
@@ -180,6 +173,5 @@ export default function RootLayout({ children }) {
           </ThemeProvider>
         </body>
       </html>
-    </ClerkProvider>
   );
 }

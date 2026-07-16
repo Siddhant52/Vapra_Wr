@@ -1,11 +1,9 @@
-import React from 'react'
+import { ClerkAuthShell } from "@/components/clerk-auth-shell";
 
-const AuthLayout = ({children}) => {
+export default function AuthLayout({ children }) {
   return (
-    <div className='flex justify-center pt-40'>
-      {children}
-    </div>
-  )
+    <ClerkAuthShell>
+      <div className="flex justify-center pt-40">{children}</div>
+    </ClerkAuthShell>
+  );
 }
-
-export default AuthLayout

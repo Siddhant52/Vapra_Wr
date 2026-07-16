@@ -116,9 +116,9 @@ export default function AboutPage() {
               <MapPin className="mt-1 h-5 w-5 text-emerald-400" />
               <div>
                 <p className="font-semibold text-white">
-                  Old Chungi Chowki, Gajner Road
+                  Chungi Chowki, Gajner road, Antyodaya Nagar
                 </p>
-                <p className="text-gray-400">Bikaner, Rajasthan 334002</p>
+                <p className="text-gray-400">Bikaner, Rajasthan 334001</p>
               </div>
             </div>
 

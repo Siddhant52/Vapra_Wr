@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
+import { loadRazorpayScript } from "@/components/razorpay-checkout-loader";
 
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -101,6 +102,8 @@ export default function PricingPage() {
       }
 
       const data = await response.json();
+      await loadRazorpayScript();
+
       const options = {
         key: publicKey,
         amount: data.amount,
@@ -282,6 +285,6 @@ export default function PricingPage() {
           Browse All Services
         </Button>
       </div>
-    </div>
+      </div>
   );
 }

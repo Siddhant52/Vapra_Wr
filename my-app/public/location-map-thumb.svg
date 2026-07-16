@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240" role="img" aria-label="Vapra Workshop location map">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" opacity="0.45"/>
+    </pattern>
+  </defs>
+  <rect width="640" height="240" fill="url(#sky)"/>
+  <rect width="640" height="240" fill="url(#grid)"/>
+  <path d="M0 175 C80 155 140 190 220 168 C300 146 360 200 440 172 C520 144 580 185 640 160 L640 240 L0 240 Z" fill="#1e3a2f" opacity="0.7"/>
+  <path d="M40 120 L200 120 L200 200 L40 200 Z" fill="#334155"/>
+  <path d="M200 140 L320 140 L320 200 L200 200 Z" fill="#475569"/>
+  <path d="M320 110 L420 110 L420 200 L320 200 Z" fill="#3f4f63"/>
+  <circle cx="480" cy="95" r="28" fill="#10b981" opacity="0.25"/>
+  <path d="M480 60 C465 60 453 72 453 87 C453 108 480 135 480 135 C480 135 507 108 507 87 C507 72 495 60 480 60 Z" fill="#10b981"/>
+  <circle cx="480" cy="86" r="9" fill="#0f172a"/>
+  <text x="40" y="48" fill="#94a3b8" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="600">Chungi Chowki, Gajner Road</text>
+  <text x="40" y="72" fill="#34d399" font-family="Segoe UI, Arial, sans-serif" font-size="14">Vapra Workshop · Antyodaya Nagar · 334001</text>
+</svg>
