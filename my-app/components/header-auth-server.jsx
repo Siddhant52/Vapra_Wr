@@ -3,35 +3,54 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { Button } from "@/components/ui/button";
 import { isAllowedAdminEmail } from "@/lib/admin-access";
 
-export async function HeaderAuthServer() {
-  const { userId } = await auth();
+function SignedOutActions() {
+  return (
+    <div className="flex items-center gap-1">
+      <Link href="/sign-in">
+        <Button
+          variant="secondary"
+          size="sm"
+          className="h-7 px-2 py-1 text-xs md:h-9 md:px-3 md:text-sm"
+        >
+          Sign In
+        </Button>
+      </Link>
+      <Link href="/sign-up">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 px-2 py-1 text-xs md:h-9 md:px-3 md:text-sm"
+        >
+          Sign Up
+        </Button>
+      </Link>
+    </div>
+  );
+}
 
-  if (!userId) {
-    return (
-      <div className="flex items-center gap-1">
-        <Link href="/sign-in">
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-7 px-2 py-1 text-xs md:h-9 md:px-3 md:text-sm"
-          >
-            Sign In
-          </Button>
-        </Link>
-        <Link href="/sign-up">
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 px-2 py-1 text-xs md:h-9 md:px-3 md:text-sm"
-          >
-            Sign Up
-          </Button>
-        </Link>
-      </div>
-    );
+export async function HeaderAuthServer() {
+  let userId = null;
+
+  try {
+    const session = await auth();
+    userId = session?.userId ?? null;
+  } catch {
+    // auth() throws when clerkMiddleware did not run (e.g. static asset 404s).
+    // Fall back to signed-out UI instead of crashing the page.
+    return <SignedOutActions />;
   }
 
-  const user = await currentUser();
+  if (!userId) {
+    return <SignedOutActions />;
+  }
+
+  let user = null;
+  try {
+    user = await currentUser();
+  } catch {
+    return <SignedOutActions />;
+  }
+
   const email =
     user?.primaryEmailAddress?.emailAddress ||
     user?.emailAddresses?.[0]?.emailAddress;

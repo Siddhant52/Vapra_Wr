@@ -20,6 +20,11 @@ export const metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  icons: {
+    icon: [{ url: "/logo-single2.png", type: "image/png" }],
+    shortcut: "/logo-single2.png",
+    apple: "/logo-single2.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -98,9 +103,8 @@ export default function RootLayout({ children }) {
           <meta name="msapplication-TileColor" content="#0f172a" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+          <link rel="icon" href="/logo-single2.png" type="image/png" />
+          <link rel="apple-touch-icon" href="/logo-single2.png" />
         </head>
         <body className={`${inter.className}`}>
           <ThemeProvider
