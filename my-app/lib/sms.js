@@ -60,6 +60,13 @@ export async function sendSMS(phone, message) {
 
 // ─── SMS Templates ────────────────────────────────────────────────────────────
 
+function getBaseUrl() {
+  return (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://vapraworkshop.com")
+  );
+}
+
 export function smsBookingCreated({ customerName, serviceName, preferredDate, requestId }) {
   const name = customerName || "Customer";
   const date = new Date(preferredDate).toLocaleDateString("en-IN", {
@@ -67,7 +74,8 @@ export function smsBookingCreated({ customerName, serviceName, preferredDate, re
     month: "short",
     year: "numeric",
   });
-  return `Hi ${name}, your booking request for ${serviceName} on ${date} has been received at Vapra Workshop. Your request ID is VAP-${requestId.slice(0, 8).toUpperCase()}. We will review it shortly.`;
+  const trackingLink = `${getBaseUrl()}/booking-status?accessCode=VAP-${requestId}`;
+  return `Hi ${name}, your booking request for ${serviceName} on ${date} has been received at Vapra Workshop. Your request ID is VAP-${requestId.slice(0, 8).toUpperCase()}. Track your booking status here: ${trackingLink}`;
 }
 
 export function smsBookingReviewed({ customerName, serviceName }) {
