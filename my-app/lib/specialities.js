@@ -1,4 +1,3 @@
-@'
 import {
   Wrench,
   Zap,
@@ -32,4 +31,3 @@ export const SPECIALTIES = [
   { name: "General Maintenance", slug: "general-maintenance", icon: <Wrench className="h-5 w-5" /> },
   { name: "Other Services", slug: "other-services", icon: <Hammer className="h-5 w-5" /> },
 ];
-'@ | Set-Content "lib\specialities.js"
