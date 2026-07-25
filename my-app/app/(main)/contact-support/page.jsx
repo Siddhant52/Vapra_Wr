@@ -291,7 +291,7 @@ export default function ContactSupportPage() {
                   <Mail className="h-5 w-5 text-emerald-400" />
                   <div>
                     <p className="font-medium">Email Support</p>
-                    <p className="text-sm text-muted-foreground">support@vapra.com</p>
+                    <p className="text-sm text-muted-foreground">ashokdevra517@gmail.com</p>
                   </div>
                 </div>
 
@@ -299,7 +299,7 @@ export default function ContactSupportPage() {
                   <Phone className="h-5 w-5 text-emerald-400" />
                   <div>
                     <p className="font-medium">Phone Support</p>
-                    <p className="text-sm text-muted-foreground">1-800-VAPRA</p>
+                    <p className="text-sm text-muted-foreground">+91-7062416273</p>
                     <p className="text-xs text-muted-foreground">Mon-Fri 9AM-6PM EST</p>
                   </div>
                 </div>
