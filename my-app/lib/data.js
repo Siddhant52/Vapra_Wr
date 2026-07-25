@@ -13,31 +13,31 @@ export const features = [
     icon: <User className="h-6 w-6 text-emerald-400" />,
     title: "Create Your Profile",
     description:
-      "Sign up and complete your profile so we can match you with mechanics and track your vehicle history.",
+      "Sign up and add your vehicle details so our team can keep track of its service history.",
   },
   {
     icon: <Calendar className="h-6 w-6 text-emerald-400" />,
     title: "Book Appointments",
     description:
-      "Browse certified mechanics, check availability, and schedule service appointments that work for you.",
+      "Check available time slots and schedule your service appointment with our workshop in just a few clicks.",
   },
   {
     icon: <Video className="h-6 w-6 text-emerald-400" />,
     title: "Remote Consultations",
     description:
-      "Connect with mechanics via secure video for diagnostics, estimates, and advice before you visit.",
+      "Talk to our mechanic over video for a quick diagnosis or estimate before you bring your vehicle in.",
   },
   {
     icon: <CreditCard className="h-6 w-6 text-emerald-400" />,
     title: "Credit-Based Payments",
     description:
-      "Buy credit bundles to pay for services, parts, and consultations—all in one easy system.",
+      "Buy credit bundles once and use them to pay for services, parts, and consultations—no repeated checkouts.",
   },
   {
     icon: <ShieldCheck className="h-6 w-6 text-emerald-400" />,
-    title: "Verified Mechanics",
+    title: "Experienced, Trusted Team",
     description:
-      "All mechanics are vetted and verified so you can trust the quality of service.",
+      "Our mechanics are experienced and background-verified, so you can trust the quality of every repair.",
   },
   {
     icon: <FileText className="h-6 w-6 text-emerald-400" />,

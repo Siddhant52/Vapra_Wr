@@ -51,15 +51,16 @@ export default async function Home() {
                 variant="outline"
                 className="bg-orange-900/30 border-orange-700/30 px-3 md:px-4 py-1.5 md:py-2 text-orange-400 text-xs md:text-sm font-medium w-fit"
               >
-                Services made simple
+                Trusted Auto Care in Bikaner
               </Badge>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                Connect with Our Services <br className="hidden sm:block" />{" "}
-                <span className="gradient-title">anytime, anywhere</span>
+                Book Your Car Service <br className="hidden sm:block" />{" "}
+                <span className="gradient-title">at Vapra Workshop, Online</span>
               </h1>
               <p className="text-muted-foreground text-base md:text-lg lg:text-xl max-w-md">
-                A single platform to schedule services, monitor repairs, and
-                maintain your vehicle's long-term health.
+                Schedule appointments, track repairs, and pay easily — all for
+                your vehicle, serviced by our trusted team right here in
+                Bikaner, Rajasthan.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 pt-2 md:pt-4">
                 {isAdmin ? (
@@ -105,7 +106,7 @@ export default async function Home() {
               How It Works
             </h2>
             <p className="text-muted-foreground text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-2">
-              Our platform makes vehicle repairs accessible with just a few clicks.
+              Getting your vehicle serviced with us takes just a few clicks.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
@@ -149,6 +150,11 @@ export default async function Home() {
             <p className="text-muted-foreground text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-2">
               Choose the perfect service plan that fits your vehicle's needs.
             </p>
+            <p className="text-muted-foreground text-xs md:text-sm max-w-2xl mx-auto px-2 mt-2">
+              Each plan below is a one-time payment for that service — no
+              credits needed. Prefer to pay as you go instead? Sign in and use
+              our credit system for individual bookings.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
@@ -189,7 +195,7 @@ export default async function Home() {
                     size="sm"
                     className="bg-emerald-700 text-white hover:bg-emerald-800 h-9 md:h-10 text-xs md:text-sm"
                   >
-                    <Link href="/pricing">Checkout via Clerk</Link>
+                    <Link href="/pricing">Choose This Plan</Link>
                   </Button>
                 </CardContent>
               </Card>
