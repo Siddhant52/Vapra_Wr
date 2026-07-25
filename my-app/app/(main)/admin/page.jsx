@@ -3,9 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { ManageMechanics } from "@/app/(main)/admin/components/manage-mechanics";
 import { ServiceRequestsManager } from "@/app/(main)/admin/components/service-requests-manager";
 import { AttendanceManager } from "@/app/(main)/admin/components/attendance-manager";
+import { WhatsAppBroadcast } from "@/app/(main)/admin/components/whatsapp-broadcast";
 import { db } from "@/lib/prisma";
 import { format } from "date-fns";
 import { listAttendanceRecords } from "@/lib/attendance-store";
+import { getWhatsAppAudienceStats } from "@/actions/whatsapp-offers";
 
 export const metadata = {
   title: "Admin Dashboard - Vapra Workshop",
@@ -71,6 +73,8 @@ export default async function AdminPage() {
     _sum: { amount: true },
     where: { status: "PAID" },
   });
+
+  const whatsAppAudienceStats = await getWhatsAppAudienceStats();
 
   const dashboardStats = {
     totalMechanics: mechanics.length,
@@ -139,7 +143,7 @@ export default async function AdminPage() {
 
           <div className="bg-white/5 backdrop-blur-2xl rounded-2xl md:rounded-3xl border border-white/10 p-4 md:p-8 shadow-2xl">
             <Tabs defaultValue="mechanics" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 md:mb-8 h-auto bg-white/5 rounded-xl md:rounded-2xl p-1.5 md:p-2 border border-white/20 gap-1">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6 md:mb-8 h-auto bg-white/5 rounded-xl md:rounded-2xl p-1.5 md:p-2 border border-white/20 gap-1">
                 <TabsTrigger value="mechanics" className="rounded-lg md:rounded-xl data-[state=active]:bg-blue-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
                   Mechanics ({mechanics.length})
                 </TabsTrigger>
@@ -151,6 +155,9 @@ export default async function AdminPage() {
                 </TabsTrigger>
                 <TabsTrigger value="payouts" className="rounded-lg md:rounded-xl data-[state=active]:bg-amber-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
                   Payouts
+                </TabsTrigger>
+                <TabsTrigger value="whatsapp" className="rounded-lg md:rounded-xl data-[state=active]:bg-green-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
+                  WhatsApp
                 </TabsTrigger>
               </TabsList>
 
@@ -261,6 +268,10 @@ export default async function AdminPage() {
                     ))}
                   </div>
                 )}
+              </TabsContent>
+
+              <TabsContent value="whatsapp" className="mt-0">
+                <WhatsAppBroadcast audienceStats={whatsAppAudienceStats} />
               </TabsContent>
             </Tabs>
           </div>

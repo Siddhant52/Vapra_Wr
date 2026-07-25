@@ -297,6 +297,7 @@ enum ReminderChannel {
   SMS
   EMAIL
   BOTH
+  WHATSAPP
 }
 
 enum ReminderStatus {

@@ -2,6 +2,12 @@
 
 import { db as prisma } from "@/lib/prisma";
 import { sendSMS } from "@/lib/sms";
+import {
+  sendWhatsApp,
+  whatsappServiceDueReminder,
+  whatsappPostServiceCheckIn,
+  whatsappWinBack,
+} from "@/lib/whatsapp";
 
 const SERVICE_DUE_DAYS = 90;
 
@@ -19,7 +25,7 @@ export async function scheduleServiceDueReminder(vehicleId, userId) {
       vehicleId,
       userId,
       type: "SERVICE_DUE",
-      channel: "BOTH",
+      channel: "WHATSAPP",
       scheduledAt: dueDate,
     },
   });
@@ -34,7 +40,7 @@ export async function schedulePostServiceCheckIn(vehicleId, userId) {
       vehicleId,
       userId,
       type: "POST_SERVICE_CHECKIN",
-      channel: "SMS",
+      channel: "WHATSAPP",
       scheduledAt,
     },
   });
@@ -65,7 +71,7 @@ export async function scheduleWinBackReminders() {
             vehicleId: v.id,
             userId: v.ownerId,
             type: "WIN_BACK",
-            channel: "BOTH",
+            channel: "WHATSAPP",
             scheduledAt: new Date(),
           },
         })
@@ -93,6 +99,12 @@ export async function processDueReminders() {
   let sent = 0;
   let failed = 0;
 
+  const WHATSAPP_TEMPLATES = {
+    SERVICE_DUE: whatsappServiceDueReminder,
+    POST_SERVICE_CHECKIN: whatsappPostServiceCheckIn,
+    WIN_BACK: whatsappWinBack,
+  };
+
   for (const reminder of dueReminders) {
     try {
       const message = MESSAGES[reminder.type];
@@ -100,6 +112,16 @@ export async function processDueReminders() {
       if (reminder.channel === "SMS" || reminder.channel === "BOTH") {
         if (reminder.user.phone) {
           await sendSMS(reminder.user.phone, message);
+        }
+      }
+
+      if (reminder.channel === "WHATSAPP" || reminder.channel === "BOTH") {
+        if (reminder.user.phone) {
+          const templateFn = WHATSAPP_TEMPLATES[reminder.type];
+          const waMessage = templateFn
+            ? templateFn({ customerName: reminder.user.name })
+            : message;
+          await sendWhatsApp(reminder.user.phone, waMessage);
         }
       }
       // Email channel: wire up your email provider here if you have one.

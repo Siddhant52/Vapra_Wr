@@ -13,6 +13,16 @@ import {
   smsBookingClosed,
   smsBookingCancelled,
 } from "@/lib/sms";
+import {
+  sendWhatsApp,
+  sendWhatsAppToAdmins,
+  whatsappNewBookingAlert,
+  whatsappBookingCreated,
+  whatsappBookingReviewed,
+  whatsappBookingAssigned,
+  whatsappBookingClosed,
+  whatsappBookingCancelled,
+} from "@/lib/whatsapp";
 
 /**
  * Create service request (customer → admin review)
@@ -96,6 +106,32 @@ export async function createServiceRequest(formData) {
       })
     );
 
+    // Send WhatsApp confirmation to customer
+    await sendWhatsApp(
+      phone,
+      whatsappBookingCreated({
+        customerName,
+        serviceName,
+        preferredDate,
+        requestId: request.id,
+      })
+    );
+
+    // Send full booking details to the admin/owner's WhatsApp
+    await sendWhatsAppToAdmins(
+      whatsappNewBookingAlert({
+        requestId: request.id,
+        customerName,
+        phone,
+        email: customerEmail,
+        serviceName,
+        vehicleInfo,
+        issueDescription,
+        preferredDate,
+        preferredTimeSlot,
+      })
+    );
+
     revalidatePath("/services/request");
     revalidatePath("/admin");
 
@@ -165,17 +201,22 @@ export async function updateServiceRequestStatus(formData) {
         preferredDate: updated.preferredDate,
       };
 
-      // Send SMS only for specific transitions
+      // Send SMS + WhatsApp only for specific transitions
       if (previousStatus === "PENDING" && status === "REVIEWED") {
         await sendSMS(updated.phone, smsBookingReviewed(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingReviewed(smsData));
       } else if (previousStatus === "REVIEWED" && status === "ASSIGNED") {
         await sendSMS(updated.phone, smsBookingAssigned(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingAssigned(smsData));
       } else if (status === "COMPLETED") {
         await sendSMS(updated.phone, smsBookingClosed(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingClosed(smsData));
       } else if (status === "CLOSED") {
         await sendSMS(updated.phone, smsBookingClosed(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingClosed(smsData));
       } else if (status === "CANCELLED") {
         await sendSMS(updated.phone, smsBookingCancelled(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingCancelled(smsData));
       }
     }
 
@@ -220,11 +261,18 @@ export async function cancelOwnServiceRequest(formData) {
       data: { status: "CANCELLED" },
     });
 
-    // Send cancellation SMS
+    // Send cancellation SMS + WhatsApp
     if (request.phone) {
       await sendSMS(
         request.phone,
         smsBookingCancelled({
+          customerName: request.customerName,
+          serviceName: request.serviceName,
+        })
+      );
+      await sendWhatsApp(
+        request.phone,
+        whatsappBookingCancelled({
           customerName: request.customerName,
           serviceName: request.serviceName,
         })

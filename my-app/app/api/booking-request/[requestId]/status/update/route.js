@@ -8,6 +8,13 @@ import {
   smsBookingClosed,
   smsBookingCancelled,
 } from "@/lib/sms";
+import {
+  sendWhatsApp,
+  whatsappBookingReviewed,
+  whatsappBookingAssigned,
+  whatsappBookingClosed,
+  whatsappBookingCancelled,
+} from "@/lib/whatsapp";
 
 const VALID_STATUSES = ["PENDING", "REVIEWED", "ASSIGNED", "COMPLETED", "CLOSED", "CANCELLED"];
 
@@ -87,12 +94,16 @@ export async function PUT(req, { params }) {
 
       if (previousStatus === "PENDING" && status === "REVIEWED") {
         await sendSMS(updated.phone, smsBookingReviewed(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingReviewed(smsData));
       } else if (previousStatus === "REVIEWED" && status === "ASSIGNED") {
         await sendSMS(updated.phone, smsBookingAssigned(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingAssigned(smsData));
       } else if (status === "COMPLETED" || status === "CLOSED") {
         await sendSMS(updated.phone, smsBookingClosed(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingClosed(smsData));
       } else if (status === "CANCELLED") {
         await sendSMS(updated.phone, smsBookingCancelled(smsData));
+        await sendWhatsApp(updated.phone, whatsappBookingCancelled(smsData));
       }
     }
 
