@@ -36,7 +36,7 @@ export async function autoSetUserRole() {
   const { userId } = await auth();
 
   if (!userId) {
-    return { success: true, redirect: "/mechanics" };
+    return { success: true, redirect: "/services" };
   }
 
   const clerkUser = await currentUser();

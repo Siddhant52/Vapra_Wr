@@ -29,14 +29,14 @@ export default function OnboardingPage() {
   // If auto-redirect finished, send the user where the server told us
   useEffect(() => {
     if (autoData && autoData?.success) {
-      router.push(autoData.redirect || "/mechanics");
+      router.push(autoData.redirect || "/services");
     }
   }, [autoData, router]);
 
   // If there is any error (unauthorized or other), send the user to booking without login
   useEffect(() => {
     if (autoError || error) {
-      router.push("/mechanics");
+      router.push("/services");
     }
   }, [autoError, error, router]);
 

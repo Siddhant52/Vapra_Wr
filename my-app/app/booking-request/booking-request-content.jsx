@@ -274,7 +274,7 @@ export default function BookingRequestContent() {
     <div className="container mx-auto px-3 md:px-4 py-6 md:py-8 pt-24 md:pt-28">
       <PageHeader
         title={`Request ${service} Service`}
-        backLink="/mechanics"
+        backLink="/services"
         backLabel="Services"
       />
 
@@ -589,7 +589,7 @@ export default function BookingRequestContent() {
       </div>
 
       <div className="pt-8 text-center">
-        <Link href="/mechanics" className="text-sm text-muted-foreground hover:text-white">
+        <Link href="/services" className="text-sm text-muted-foreground hover:text-white">
           Back to all services
         </Link>
       </div>
