@@ -1,10 +1,26 @@
 import { Vonage } from "@vonage/server-sdk";
 import { Channels } from "@vonage/messages";
 
-const vonage = new Vonage({
-  apiKey: process.env.VONAGE_API_KEY,
-  apiSecret: process.env.VONAGE_API_SECRET,
-});
+// Vonage's Messages API defaults to the PRODUCTION host (api.nexmo.com).
+// A fresh Vonage account that's only set up on the Messages API Sandbox
+// (dashboard shows "messages-sandbox.nexmo.com") needs this overridden,
+// or every send silently fails because the sandbox sender/recipient
+// numbers aren't recognized on production.
+//
+// Set VONAGE_WHATSAPP_API_HOST="https://api.nexmo.com" once you have an
+// approved production WhatsApp Business sender.
+const WHATSAPP_API_HOST =
+  process.env.VONAGE_WHATSAPP_API_HOST || "https://messages-sandbox.nexmo.com";
+
+const vonage = new Vonage(
+  {
+    apiKey: process.env.VONAGE_API_KEY,
+    apiSecret: process.env.VONAGE_API_SECRET,
+  },
+  {
+    apiHost: WHATSAPP_API_HOST,
+  }
+);
 
 // The Vonage WhatsApp-enabled sender number (Business API / Sandbox number),
 // e.g. "14157386102" — NOT the same as your SMS "from" name.
