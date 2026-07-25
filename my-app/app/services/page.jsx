@@ -1,7 +1,14 @@
+@'
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { SPECIALTIES } from "@/lib/specialities";
+
+export const metadata = {
+  title: "Our Services | Vapra Workshop",
+  description:
+    "Browse Vapra Workshop full range of auto repair services in Bikaner - engine repair, brake service, oil change, electrical, AC, and more.",
+};
 
 export default async function ServicesPage() {
   return (
@@ -17,8 +24,8 @@ export default async function ServicesPage() {
         <div className="flex flex-wrap justify-center gap-5">
           {SPECIALTIES.map((specialty) => (
             <Link
-              key={specialty.name}
-              href={`/services/${specialty.name}`}
+              key={specialty.slug}
+              href={`/services/${specialty.slug}`}
               className="w-full sm:w-[calc(50%-0.625rem)] md:w-[calc(33.333%-0.85rem)] lg:w-[calc(25%-0.95rem)]"
             >
               <Card className="group h-full border-emerald-900/20 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-600/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
@@ -38,3 +45,4 @@ export default async function ServicesPage() {
     </div>
   );
 }
+'@ | Set-Content "app\services\page.jsx"

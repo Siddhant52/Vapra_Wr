@@ -1,8 +1,25 @@
+@'
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { SPECIALTIES } from "@/lib/specialities";
+
+function findSpecialtyBySlug(slug) {
+  return SPECIALTIES.find((s) => s.slug === slug);
+}
+
+export async function generateMetadata({ params }) {
+  const { service } = await params;
+  const specialty = findSpecialtyBySlug(service);
+  const name = specialty?.name || "Service";
+
+  return {
+    title: `${name} | Vapra Workshop`,
+    description: `Book ${name} at Vapra Workshop in Bikaner. Fast, transparent, and reliable auto repair service.`,
+  };
+}
 
 export default async function ServiceDetailPage({ params }) {
   const { service } = await params;
@@ -11,7 +28,8 @@ export default async function ServiceDetailPage({ params }) {
     redirect("/services");
   }
 
-  const decodedService = service.split("%20").join(" ");
+  const specialty = findSpecialtyBySlug(service);
+  const decodedService = specialty?.name || service.replace(/-/g, " ");
   const bookingUrl = `/booking-request?service=${encodeURIComponent(decodedService)}`;
 
   return (
@@ -61,7 +79,7 @@ export default async function ServiceDetailPage({ params }) {
             <div>
               <h4 className="font-semibold text-white mb-2">Step 3: Confirmation</h4>
               <p className="text-sm text-muted-foreground">
-                You’ll receive a confirmation with the scheduled date, time, and estimated cost.
+                You will receive a confirmation with the scheduled date, time, and estimated cost.
               </p>
             </div>
             <div>
@@ -76,3 +94,4 @@ export default async function ServiceDetailPage({ params }) {
     </div>
   );
 }
+'@ | Set-Content "app\services\[service]\page.jsx"
