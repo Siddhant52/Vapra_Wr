@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/sign-out-button";
 import { isAllowedAdminEmail } from "@/lib/admin-access";
 
 function SignedOutActions() {
@@ -89,15 +90,7 @@ export async function HeaderAuthServer() {
         />
       </Link>
 
-      <Link href="/sign-out" className="hidden sm:inline-flex">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 px-2 py-1 text-xs text-gray-300 hover:text-white md:h-9 md:px-3 md:text-sm"
-        >
-          Sign Out
-        </Button>
-      </Link>
+      <SignOutButton className="hidden h-7 px-2 py-1 text-xs text-gray-300 hover:text-white sm:inline-flex md:h-9 md:px-3 md:text-sm" />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { HeaderShell } from "@/components/header-shell";
 import { FooterMap } from "@/components/footer-map";
+import { ClerkAuthShell } from "@/components/clerk-auth-shell";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -115,6 +116,7 @@ export default function RootLayout({ children }) {
           <link rel="shortcut icon" href="/favicon-32x32.png" />
         </head>
         <body className={`${inter.className}`}>
+          <ClerkAuthShell>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -193,6 +195,7 @@ export default function RootLayout({ children }) {
               </div>
             </footer>
           </ThemeProvider>
+          </ClerkAuthShell>
         </body>
       </html>
   );
