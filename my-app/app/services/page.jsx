@@ -1,4 +1,3 @@
-@'
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
@@ -45,4 +44,3 @@ export default async function ServicesPage() {
     </div>
   );
 }
-'@ | Set-Content "app\services\page.jsx"

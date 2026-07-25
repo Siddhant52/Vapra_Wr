@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { db as prisma } from "@/lib/prisma";
 import { sendSMS } from "@/lib/sms";
 
 const SERVICE_DUE_DAYS = 90;

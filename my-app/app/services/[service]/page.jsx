@@ -1,4 +1,3 @@
-@'
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
@@ -94,4 +93,3 @@ export default async function ServiceDetailPage({ params }) {
     </div>
   );
 }
-'@ | Set-Content "app\services\[service]\page.jsx"
