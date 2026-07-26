@@ -5,7 +5,6 @@ import { ServiceRequestsManager } from "@/app/(main)/admin/components/service-re
 import { AttendanceManager } from "@/app/(main)/admin/components/attendance-manager";
 import { WhatsAppBroadcast } from "@/app/(main)/admin/components/whatsapp-broadcast";
 import { db } from "@/lib/prisma";
-import { format } from "date-fns";
 import { listAttendanceRecords } from "@/lib/attendance-store";
 import { getWhatsAppAudienceStats } from "@/actions/whatsapp-offers";
 
@@ -18,7 +17,7 @@ export default async function AdminPage() {
   const attendanceDate = new Date();
   attendanceDate.setHours(0, 0, 0, 0);
 
-  const [mechanics, serviceRequests, payouts] = await Promise.all([
+  const [mechanics, serviceRequests] = await Promise.all([
     db.user.findMany({
       where: { role: "MECHANIC" },
       select: {
@@ -26,18 +25,12 @@ export default async function AdminPage() {
         name: true,
         specialty: true,
         experience: true,
-        credits: true,
         verificationStatus: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" },
     }),
     db.bookingRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 30,
-    }),
-    db.payout.findMany({
-      where: { status: "PROCESSING" },
       orderBy: { createdAt: "desc" },
       take: 30,
     }),
@@ -80,7 +73,6 @@ export default async function AdminPage() {
     totalMechanics: mechanics.length,
     activeJobs: serviceRequests.filter((item) => item.status === "PENDING").length,
     totalRevenue: totalRevenueAgg._sum.amount || 0,
-    pendingPayouts: payouts.length,
   };
 
   const getStatusBadge = (status) => {
@@ -97,14 +89,6 @@ export default async function AdminPage() {
     return "Junior";
   };
 
-  const getPerformanceRating = (credits, bookings) => {
-    const score = (credits / 100 + bookings / 50);
-    if (score >= 10) return "★★★★★";
-    if (score >= 7) return "★★★★";
-    if (score >= 4) return "★★★";
-    return "★★";
-  };
-
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 to-slate-800 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
@@ -118,7 +102,7 @@ export default async function AdminPage() {
         </div>
 
         <section id="dashboard">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-6 md:mb-8">
             <div className="p-4 md:p-8 rounded-2xl md:rounded-3xl bg-blue-500/10 border-2 border-blue-500/30 hover:border-blue-400 transition-all backdrop-blur-sm">
               <div className="text-blue-300 mb-1 md:mb-3 text-sm md:text-lg font-semibold">Mechanics</div>
               <div className="text-3xl md:text-4xl font-black text-white">{dashboardStats.totalMechanics}</div>
@@ -134,16 +118,11 @@ export default async function AdminPage() {
               <div className="text-2xl md:text-4xl font-black text-white">₹{dashboardStats.totalRevenue.toLocaleString()}</div>
               <div className="text-amber-200 mt-1 md:mt-2 text-xs md:text-sm font-medium">Lifetime</div>
             </div>
-            <div className="p-4 md:p-8 rounded-2xl md:rounded-3xl bg-red-500/10 border-2 border-red-500/30 hover:border-red-400 transition-all backdrop-blur-sm">
-              <div className="text-red-300 mb-1 md:mb-3 text-sm md:text-lg font-semibold">Payouts</div>
-              <div className="text-3xl md:text-4xl font-black text-white">{dashboardStats.pendingPayouts}</div>
-              <div className="text-red-200 mt-1 md:mt-2 text-xs md:text-sm font-medium">Review needed</div>
-            </div>
           </div>
 
           <div className="bg-white/5 backdrop-blur-2xl rounded-2xl md:rounded-3xl border border-white/10 p-4 md:p-8 shadow-2xl">
             <Tabs defaultValue="mechanics" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6 md:mb-8 h-auto bg-white/5 rounded-xl md:rounded-2xl p-1.5 md:p-2 border border-white/20 gap-1">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6 md:mb-8 h-auto bg-white/5 rounded-xl md:rounded-2xl p-1.5 md:p-2 border border-white/20 gap-1">
                 <TabsTrigger value="mechanics" className="rounded-lg md:rounded-xl data-[state=active]:bg-blue-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
                   Mechanics ({mechanics.length})
                 </TabsTrigger>
@@ -152,9 +131,6 @@ export default async function AdminPage() {
                 </TabsTrigger>
                 <TabsTrigger value="requests" className="rounded-lg md:rounded-xl data-[state=active]:bg-emerald-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
                   Requests
-                </TabsTrigger>
-                <TabsTrigger value="payouts" className="rounded-lg md:rounded-xl data-[state=active]:bg-amber-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
-                  Payouts
                 </TabsTrigger>
                 <TabsTrigger value="whatsapp" className="rounded-lg md:rounded-xl data-[state=active]:bg-green-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
                   WhatsApp
@@ -178,10 +154,6 @@ export default async function AdminPage() {
                         <Badge className={`text-xs ${m.experience >= 10 ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' : m.experience >= 5 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-slate-500/20 text-slate-300 border-slate-500/30'}`}>
                           {getExperienceLabel(m.experience)}
                         </Badge>
-                        <span className="bg-emerald-500/20 px-2 py-0.5 rounded-full text-emerald-300 font-mono text-xs">
-                          {m.credits.toLocaleString()} credits
-                        </span>
-                        <span className="text-amber-300 text-xs">{getPerformanceRating(m.credits, m.bookings || 0)}</span>
                       </div>
                     </div>
                   ))}
@@ -192,9 +164,7 @@ export default async function AdminPage() {
                       <tr className="border-b border-white/10 bg-white/5">
                         <th className="text-left py-4 px-6 font-bold text-white">Name</th>
                         <th className="text-left py-4 px-6 font-bold text-white w-24">Level</th>
-                        <th className="text-left py-4 px-6 font-bold text-white">Credits</th>
                         <th className="text-left py-4 px-6 font-bold text-white">Bookings</th>
-                        <th className="text-left py-4 px-6 font-bold text-white w-28">Rating</th>
                         <th className="text-left py-4 px-6 font-bold text-white w-28">Status</th>
                       </tr>
                     </thead>
@@ -210,13 +180,7 @@ export default async function AdminPage() {
                               {getExperienceLabel(m.experience)}
                             </Badge>
                           </td>
-                          <td className="py-4 px-6">
-                            <div className="bg-emerald-500/20 px-4 py-2 rounded-full text-emerald-300 font-mono">
-                              {m.credits.toLocaleString()}
-                            </div>
-                          </td>
                           <td className="py-4 px-6 text-blue-300 font-mono">{m.bookings || 0}</td>
-                          <td className="py-4 px-6 text-amber-300 font-medium">{getPerformanceRating(m.credits, m.bookings || 0)}</td>
                           <td className="py-4 px-6">
                             <Badge className={getStatusBadge(m.verificationStatus?.toLowerCase?.() || 'inactive')}>
                               {m.verificationStatus === 'VERIFIED' ? 'VERIFIED' : 'PENDING'}
@@ -239,35 +203,6 @@ export default async function AdminPage() {
 
               <TabsContent value="requests" className="mt-0">
                 <ServiceRequestsManager requests={serviceRequests} />
-              </TabsContent>
-
-              <TabsContent value="payouts" className="mt-0">
-                {payouts.length === 0 ? (
-                  <div className="text-center py-12 md:py-20 bg-white/5 rounded-2xl border-2 border-dashed border-white/20">
-                    <h3 className="text-xl md:text-3xl font-bold text-white">No Payouts Pending</h3>
-                    <p className="text-slate-300 mt-2 text-sm md:text-base px-4">Mechanic payout requests will appear here when submitted.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 gap-4">
-                    {payouts.map((payout) => (
-                      <div key={payout.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 md:p-5">
-                        <div className="flex justify-between items-start gap-2">
-                          <div>
-                            <h4 className="text-sm md:text-lg font-bold text-white">Mechanic ID: {payout.mechanicId || "Unknown"}</h4>
-                            <p className="text-xs md:text-sm text-slate-300">{payout.upiId || "No UPI info"}</p>
-                          </div>
-                          <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs shrink-0">{payout.status}</Badge>
-                        </div>
-                        <div className="mt-3 text-xs md:text-sm text-slate-300">
-                          Credits: {payout.credits} • Amount: ₹{payout.amount.toLocaleString()} • Net: ₹{payout.netAmount.toLocaleString()}
-                        </div>
-                        <div className="mt-2 text-xs text-slate-400">
-                          Requested on {format(new Date(payout.createdAt), "MMM d, yyyy h:mm a")}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </TabsContent>
 
               <TabsContent value="whatsapp" className="mt-0">

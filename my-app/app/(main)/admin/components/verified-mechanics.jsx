@@ -261,9 +261,6 @@ export function VerifiedMechanics({ mechanics }) {
                             <Badge variant="outline" className="bg-amber-900/20 border-amber-900/30 text-amber-400">
                               {mechanic.inProgressCount || 0} In Progress
                             </Badge>
-                            <Badge variant="outline" className="bg-emerald-900/20 border-emerald-900/30 text-emerald-400">
-                              {mechanic.credits || 0} Credits
-                            </Badge>
                           </div>
                           {/* Active Jobs */}
                           {mechanic.mechanicBookings?.length > 0 && (

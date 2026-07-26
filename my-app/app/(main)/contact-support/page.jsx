@@ -300,7 +300,7 @@ export default function ContactSupportPage() {
                   <div>
                     <p className="font-medium">Phone Support</p>
                     <p className="text-sm text-muted-foreground">+91-7062416273</p>
-                    <p className="text-xs text-muted-foreground">Mon-Fri 9AM-6PM EST</p>
+                    <p className="text-xs text-muted-foreground">Open 7 days, 9AM-6PM IST</p>
                   </div>
                 </div>
               </CardContent>
@@ -328,7 +328,7 @@ export default function ContactSupportPage() {
                 <div>
                   <h4 className="font-medium text-sm">Billing Questions?</h4>
                   <p className="text-xs text-muted-foreground">
-                    Contact us for help with credits and payments.
+                    Contact us for help with payments and billing.
                   </p>
                 </div>
               </CardContent>

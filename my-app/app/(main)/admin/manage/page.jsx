@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { ManageMechanics } from "@/app/(main)/admin/components/manage-mechanics";
 import { ServiceRequestsManager } from "@/app/(main)/admin/components/service-requests-manager";
 import { db } from "@/lib/prisma";
@@ -10,7 +9,7 @@ export const metadata = {
 };
 
 export default async function AdminManagePage() {
-  const [mechanics, serviceRequests, payouts] = await Promise.all([
+  const [mechanics, serviceRequests] = await Promise.all([
     db.user.findMany({
       where: { role: "MECHANIC" },
       select: {
@@ -18,17 +17,11 @@ export default async function AdminManagePage() {
         name: true,
         experience: true,
         specialty: true,
-        credits: true,
         verificationStatus: true,
       },
       orderBy: { createdAt: "desc" },
     }),
     db.bookingRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 30,
-    }),
-    db.payout.findMany({
-      where: { status: "PROCESSING" },
       orderBy: { createdAt: "desc" },
       take: 30,
     }),
@@ -75,27 +68,6 @@ export default async function AdminManagePage() {
             </div>
           </div>
 
-          {/* Payouts */}
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 md:p-6 mt-6">
-            <h3 className="text-base md:text-lg font-bold text-white mb-3">Outstanding Payouts</h3>
-            {payouts.length === 0 ? (
-              <p className="text-slate-300 text-sm">No payouts currently processing.</p>
-            ) : (
-              <div className="grid grid-cols-1 gap-3">
-                {payouts.map((payout) => (
-                  <div key={payout.id} className="rounded-lg border border-white/10 bg-slate-950 p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm text-white truncate">Mechanic: {payout.mechanicId || "Unknown"}</span>
-                      <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-xs shrink-0">{payout.status}</Badge>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-1">
-                      Amount: ₹{payout.amount.toLocaleString()} • Credits: {payout.credits}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

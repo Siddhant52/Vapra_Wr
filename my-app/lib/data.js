@@ -29,9 +29,9 @@ export const features = [
   },
   {
     icon: <CreditCard className="h-6 w-6 text-emerald-400" />,
-    title: "Credit-Based Payments",
+    title: "Simple Online Payments",
     description:
-      "Buy credit bundles once and use them to pay for services, parts, and consultations—no repeated checkouts.",
+      "Pay securely online for your chosen service plan—no repeated paperwork, just a clear one-time payment.",
   },
   {
     icon: <ShieldCheck className="h-6 w-6 text-emerald-400" />,
@@ -68,7 +68,7 @@ export const testimonials = [
     name: "Sanjay V.",
     role: "Customer",
     quote:
-      "I love the credit system. It keeps billing simple and lets me book services without fumbling through invoices.",
+      "The service plans make pricing simple. I know exactly what I'm paying for before I book, no surprises.",
   },
 ];
 
@@ -92,7 +92,10 @@ export const servicePlans = [
     description: "Most popular for regular maintenance",
     popular: true,
     features: [
-      "Everything in Essential (₹599)",
+      "All services",
+      "Filter",
+      "General checkup",
+      "Washing",
       "Tire & brake",
       "Body checkup",
       "Wiring",
@@ -104,19 +107,17 @@ export const servicePlans = [
     description: "Complete care, top to bottom",
     popular: false,
     features: [
-      "Everything in Standard",
+      "All services",
+      "Filter",
+      "General checkup",
+      "Washing",
+      "Tire & brake",
+      "Body checkup",
+      "Wiring",
       "Radiator",
       "Deep cleaning",
       "Suspension checkup",
       "Others",
     ],
   },
-];
-
-// JSON data for credit system benefits
-export const creditBenefits = [
-  "Each service booking uses <strong class='text-emerald-400'>2 credits</strong> so you know what each appointment costs.",
-  "Credits <strong class='text-emerald-400'>never expire</strong>—use them whenever your vehicle needs work.",
-  "Monthly subscriptions give you <strong class='text-emerald-400'>fresh credits every month</strong> for regular maintenance.",
-  "Use credits for inspections, repairs, and video consultations with mechanics.",
 ];

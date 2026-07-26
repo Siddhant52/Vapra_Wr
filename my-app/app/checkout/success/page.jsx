@@ -24,7 +24,7 @@ export default async function CheckoutSuccessPage() {
           </CardHeader>
           <CardContent className="text-center space-y-6">
             <p className="text-gray-300">
-              Thank you for your purchase. Your credits have been added to your account and you can now book services.
+              Thank you for your purchase. Your payment has been received and our team will be in touch to schedule your service.
             </p>
 
             <div className="space-y-3">

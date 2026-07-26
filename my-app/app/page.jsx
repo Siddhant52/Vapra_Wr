@@ -7,8 +7,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { creditBenefits, features, testimonials, servicePlans } from "@/lib/data";
-import { ArrowRight, Check, Wrench } from "lucide-react";
+import { features, testimonials, servicePlans } from "@/lib/data";
+import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 import { getCurrentUser } from "@/actions/onboarding";
 import TrackAppointmentButton from "@/components/track-appointment-button";
@@ -150,11 +150,6 @@ export default async function Home() {
             <p className="text-muted-foreground text-sm md:text-base lg:text-lg max-w-2xl mx-auto px-2">
               Choose the perfect service plan that fits your vehicle's needs.
             </p>
-            <p className="text-muted-foreground text-xs md:text-sm max-w-2xl mx-auto px-2 mt-2">
-              Each plan below is a one-time payment for that service — no
-              credits needed. Prefer to pay as you go instead? Sign in and use
-              our credit system for individual bookings.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
@@ -202,29 +197,6 @@ export default async function Home() {
             ))}
           </div>
 
-          <Card className="mt-8 md:mt-10 bg-muted/20 border-orange-900/30">
-            <CardHeader>
-              <CardTitle className="text-base md:text-lg font-semibold text-white flex items-center">
-                <Wrench className="h-4 md:h-5 w-4 md:w-5 mr-2 text-orange-400" />
-                How Our Credit System Works
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 md:space-y-3">
-                {creditBenefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="mr-2 md:mr-3 mt-0.5 md:mt-1 bg-orange-900/20 p-1 rounded-full flex-shrink-0">
-                      <Check className="h-3 md:h-4 w-3 md:w-4 text-orange-400" />
-                    </div>
-                    <p
-                      className="text-xs md:text-sm text-muted-foreground"
-                      dangerouslySetInnerHTML={{ __html: benefit }}
-                    ></p>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
         </div>
       </section>
 

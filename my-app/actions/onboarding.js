@@ -75,7 +75,6 @@ async function setRole({ userId, clerkUser, role }) {
         name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
         imageUrl: clerkUser.imageUrl,
         role,
-        credits: role === "CUSTOMER" ? 5 : 0, // Free credits for customers
       },
     });
 
@@ -139,7 +138,6 @@ export async function getCurrentUser() {
         name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
         imageUrl: clerkUser.imageUrl,
         role: resolvedRole,
-        credits: 5, // Welcome credits
       },
     });
 
@@ -150,7 +148,6 @@ export async function getCurrentUser() {
       name: user.name,
       imageUrl: user.imageUrl,
       role: user.role,
-      credits: user.credits,
       experience: user.experience || 0,
     };
   } catch (error) {
@@ -161,7 +158,6 @@ export async function getCurrentUser() {
       email,
       name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
       role: isAdminEmail ? "ADMIN" : "CUSTOMER",
-      credits: 5,
     };
   }
 }

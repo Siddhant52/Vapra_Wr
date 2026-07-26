@@ -253,7 +253,7 @@ export default function BookingRequestContent() {
               <DialogTitle className="text-lg md:text-xl">Enjoyed the fast booking?</DialogTitle>
               <DialogDescription className="text-xs md:text-sm">
                 You can save time next visit by creating an account.
-                Sign-up now to track requests, get faster responses, and earn credits.
+                Sign-up now to track requests and get faster responses.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-4">

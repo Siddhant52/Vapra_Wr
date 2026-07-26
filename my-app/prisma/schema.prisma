@@ -21,17 +21,14 @@ model User {
   updatedAt          DateTime             @updatedAt
   experience         Int?
   verificationStatus VerificationStatus   @default(PENDING)
-  credits            Int                  @default(0)
   specialty          String?
   phone              String?
   aadhar              String? 
   customerBookings   Booking[]            @relation("CustomerBookings")
   mechanicBookings   Booking[]            @relation("MechanicBookings")
   bookingRequests    BookingRequest[]
-  creditTransactions CreditTransaction[]
   attendances        MechanicAttendance[]
   payments           Payment[]
-  payouts            Payout[]
   vehicles           Vehicle[]
 
   @@index([role])
@@ -143,37 +140,6 @@ model Payment {
   @@index([transactionId])
 }
 
-model Payout {
-  id          String       @id @default(uuid())
-  amount      Float
-  credits     Int
-  platformFee Float
-  netAmount   Float
-  status      PayoutStatus @default(PROCESSING)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  processedAt DateTime?
-  processedBy String?
-  mechanicId  String
-  upiId       String?
-  mechanic    User         @relation(fields: [mechanicId], references: [id], onDelete: Cascade)
-
-  @@index([status, createdAt])
-  @@index([mechanicId, status])
-}
-
-model CreditTransaction {
-  id        String          @id @default(uuid())
-  userId    String
-  amount    Int
-  type      TransactionType
-  createdAt DateTime        @default(now())
-  note      String?
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-}
-
 model BookingRequest {
   id                String               @id @default(uuid())
   customerId        String?
@@ -251,20 +217,6 @@ enum PaymentStatus {
   FAILED
   REFUNDED
   PENDING
-}
-
-enum PayoutStatus {
-  PROCESSING
-  PROCESSED
-  FAILED
-}
-
-enum TransactionType {
-  ADMIN_ADJUSTMENT
-  MONTHLY_ALLOCATION
-  SERVICE_BOOKING
-  SERVICE_EARNING
-  MANUAL_REFUND
 }
 
 enum BookingRequestStatus {
