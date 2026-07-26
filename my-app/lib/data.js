@@ -1,6 +1,6 @@
 import {
   Calendar,
-  Video,
+  MessageCircle,
   CreditCard,
   User,
   FileText,
@@ -22,10 +22,10 @@ export const features = [
       "Check available time slots and schedule your service appointment with our workshop in just a few clicks.",
   },
   {
-    icon: <Video className="h-6 w-6 text-emerald-400" />,
-    title: "Remote Consultations",
+    icon: <MessageCircle className="h-6 w-6 text-emerald-400" />,
+    title: "WhatsApp Updates",
     description:
-      "Talk to our mechanic over video for a quick diagnosis or estimate before you bring your vehicle in.",
+      "Get instant WhatsApp messages when your booking is created, reviewed, assigned to a mechanic, and completed.",
   },
   {
     icon: <CreditCard className="h-6 w-6 text-emerald-400" />,

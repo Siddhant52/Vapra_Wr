@@ -14,6 +14,7 @@ export default function Header({ authSlot }) {
     { href: "/about", label: "About" },
     { href: "/pricing", label: "Pricing" },
     { href: "/services", label: "Services" },
+    { href: "/service-history", label: "History" },
     { href: "/contact-support", label: "Support" },
   ];
 
