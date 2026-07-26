@@ -68,7 +68,14 @@ export async function sendWhatsApp(phone, message) {
     console.log("[WhatsApp] Sent:", result.messageUUID);
     return result;
   } catch (error) {
-    console.error("[WhatsApp] Send failed:", error?.message);
+    const detail = error?.response?.data || error?.response?.body || error?.body;
+    console.error(
+      "[WhatsApp] Send failed for",
+      to,
+      "-",
+      error?.response?.status || error?.message,
+      detail ? JSON.stringify(detail) : "(no response body captured)"
+    );
     return null;
   }
 }
