@@ -37,6 +37,19 @@ function formatPhone(phone) {
   if (cleaned.length === 10) return `91${cleaned}`;
   return cleaned;
 }
+export { formatPhone };
+
+/**
+ * The last 10 digits of a phone number, used to match an inbound WhatsApp
+ * sender number (always full international format) back to a user's `phone`
+ * field, whatever format it happens to be stored in (with/without country
+ * code, spaces, dashes, etc).
+ */
+export function last10Digits(phone) {
+  if (!phone) return null;
+  const cleaned = phone.replace(/\D/g, "");
+  return cleaned.length >= 10 ? cleaned.slice(-10) : cleaned || null;
+}
 
 /**
  * Send a WhatsApp text message to a single phone number.
@@ -71,6 +84,59 @@ export async function sendWhatsApp(phone, message) {
     const detail = error?.response?.data || error?.response?.body || error?.body;
     console.error(
       "[WhatsApp] Send failed for",
+      to,
+      "-",
+      error?.response?.status || error?.message,
+      detail ? JSON.stringify(detail) : "(no response body captured)"
+    );
+    return null;
+  }
+}
+
+/**
+ * Send a WhatsApp image message (with an optional caption) to a single phone
+ * number. Used for post-style promotional broadcasts (image + caption, like
+ * an Instagram/X post). `imageUrl` must be a publicly reachable HTTPS URL —
+ * WhatsApp fetches it directly, it cannot be a local file path.
+ * Fails silently (logs only) so a WhatsApp outage never blocks a booking flow.
+ */
+export async function sendWhatsAppImage(phone, imageUrl, caption) {
+  const to = formatPhone(phone);
+
+  if (!to) {
+    console.error("[WhatsApp] Invalid phone number:", phone);
+    return null;
+  }
+
+  if (!imageUrl) {
+    console.error("[WhatsApp] sendWhatsAppImage called without an imageUrl");
+    return null;
+  }
+
+  if (!process.env.VONAGE_API_KEY || !process.env.VONAGE_API_SECRET || !WHATSAPP_FROM) {
+    console.warn(
+      "[WhatsApp] Vonage WhatsApp not configured (missing VONAGE_API_KEY / VONAGE_API_SECRET / VONAGE_WHATSAPP_NUMBER). Skipping."
+    );
+    return null;
+  }
+
+  try {
+    const result = await vonage.messages.send({
+      messageType: "image",
+      channel: Channels.WHATSAPP,
+      image: {
+        url: imageUrl,
+        ...(caption ? { caption } : {}),
+      },
+      to,
+      from: WHATSAPP_FROM,
+    });
+    console.log("[WhatsApp] Sent image:", result.messageUUID);
+    return result;
+  } catch (error) {
+    const detail = error?.response?.data || error?.response?.body || error?.body;
+    console.error(
+      "[WhatsApp] Image send failed for",
       to,
       "-",
       error?.response?.status || error?.message,
@@ -190,9 +256,24 @@ export function whatsappWinBack({ customerName }) {
 }
 
 /**
- * Free-form promotional/offer message, used by the admin broadcast tool.
+ * Required opt-out line appended to every promotional broadcast, per
+ * WhatsApp Business messaging policy. Real STOP handling lives in
+ * app/api/whatsapp/inbound/route.js, which marks the sender opted-out.
  */
-export function whatsappOffer({ customerName, offerText }) {
+export function unsubscribeFooter() {
+  return `Reply "STOP" to unsubscribe from offers.`;
+}
+
+/**
+ * Free-form promotional/offer message, used by the admin broadcast tool.
+ * `title` renders as a bold headline (like a post title), `offerText` as
+ * the body. Used as plain text when there's no image, or as the image
+ * caption when the admin attaches a photo.
+ */
+export function whatsappOffer({ customerName, title, offerText }) {
   const name = customerName || "there";
-  return `Hi ${name}! 🎉 ${offerText}\n\n— Team Vapra Workshop`;
+  const parts = [];
+  if (title) parts.push(`*${title}*`, ``);
+  parts.push(`Hi ${name}! 🎉 ${offerText}`, ``, `— Team Vapra Workshop`, ``, unsubscribeFooter());
+  return parts.join("\n");
 }

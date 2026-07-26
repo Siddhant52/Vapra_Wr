@@ -20,6 +20,7 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
+    "@vercel/blob": "^2.6.1",
     "@vonage/messages": "^1.24.0",
     "@vonage/server-sdk": "^3.27.0",
     "class-variance-authority": "^0.7.1",

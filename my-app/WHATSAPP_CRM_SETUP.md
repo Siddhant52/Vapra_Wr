@@ -34,18 +34,46 @@ Your existing `VONAGE_API_KEY` and `VONAGE_API_SECRET` are reused — no changes
 
 **Important (sandbox mode only):** each number in `ADMIN_WHATSAPP_NUMBERS`, and any customer you expect to message, must first message the Vonage sandbox number with the join code shown in your dashboard. Until they do, messages to that number will silently fail (check your server logs for `[WhatsApp] Send failed`).
 
-## 3. Apply the database migration
+## 3. Apply the database migrations
 
-A migration adding `WHATSAPP` as a reminder channel has already been created at:
+Two migrations are relevant here:
 ```
 prisma/migrations/20260725140000_add_whatsapp_reminder_channel/migration.sql
+prisma/migrations/20260726150000_add_whatsapp_optout/migration.sql   (adds User.whatsappOptOut)
 ```
 
-Apply it:
+Apply them:
 ```bash
 npx prisma migrate dev
 ```
 (Or `npx prisma migrate deploy` in production/CI.)
+
+## 3b. Image posts + real "Reply STOP to unsubscribe"
+
+The admin WhatsApp tab now works like a social post composer: pick a photo, write a headline + caption, and send it as an image message (not just plain text), with a live preview of exactly what the customer's WhatsApp will show. Two extra things need to be wired up for this:
+
+### Image uploads (Vercel Blob)
+
+Photos the admin uploads need a public HTTPS URL for WhatsApp to fetch — a local file path won't work. This uses [Vercel Blob](https://vercel.com/docs/storage/vercel-blob):
+
+1. In your Vercel project dashboard → **Storage** → **Create Database** → **Blob**. Connect it to this project.
+2. Vercel automatically adds a `BLOB_READ_WRITE_TOKEN` environment variable — no manual setup needed.
+3. Locally, run `vercel env pull .env` (or copy the token manually into your `.env`) so uploads work in dev too.
+
+Until `BLOB_READ_WRITE_TOKEN` is set, the image upload button will show an error but text-only broadcasts still work fine.
+
+### Real STOP / START unsubscribe
+
+A migration adds a `whatsappOptOut` flag on `User` (see step 3 below — same `prisma migrate` command covers both). Every broadcast now skips customers where this is `true`.
+
+To make replying "STOP" actually flip that flag, point Vonage at the new inbound webhook:
+
+1. Vonage Dashboard → your Messages API **Application** → **Capabilities** → enable **Messages**, and set the **Inbound URL** to:
+   ```
+   https://vapraworkshop.com/api/whatsapp/inbound
+   ```
+2. That's it — no new env vars needed. When a customer texts "STOP" (or "unsubscribe"), they're marked opted-out and get a one-line confirmation; texting "START" (or "subscribe") re-enables them.
+3. In sandbox mode, this only works for numbers that have joined your sandbox, same as sending.
 
 ## 4. Where things live in the code
 
@@ -55,8 +83,9 @@ npx prisma migrate dev
 | New booking → admin WhatsApp alert | `actions/bookingRequest.js` (`createServiceRequest`) |
 | Status-change → customer WhatsApp | `actions/bookingRequest.js` (`updateServiceRequestStatus`) and `app/api/booking-request/[requestId]/status/update/route.js` |
 | Automated reminders over WhatsApp | `actions/reminders.js` (`processDueReminders`) |
-| Offer broadcast (admin-only) | `actions/whatsapp-offers.js` |
-| Admin "WhatsApp" tab UI | `app/(main)/admin/components/whatsapp-broadcast.jsx` |
+| Offer broadcast + image upload (admin-only) | `actions/whatsapp-offers.js` |
+| Admin "WhatsApp" tab UI (post composer + preview) | `app/(main)/admin/components/whatsapp-broadcast.jsx` |
+| Inbound STOP/START webhook | `app/api/whatsapp/inbound/route.js` |
 
 ## 5. Testing
 

@@ -23,6 +23,7 @@ model User {
   verificationStatus VerificationStatus   @default(PENDING)
   specialty          String?
   phone              String?
+  whatsappOptOut     Boolean              @default(false)
   aadhar              String? 
   customerBookings   Booking[]            @relation("CustomerBookings")
   mechanicBookings   Booking[]            @relation("MechanicBookings")
