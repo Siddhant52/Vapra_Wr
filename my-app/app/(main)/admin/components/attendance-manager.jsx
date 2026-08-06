@@ -42,6 +42,10 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
   const [salaryRange, setSalaryRange] = useState("currentMonth");
   const [salaryFromDate, setSalaryFromDate] = useState("");
   const [salaryToDate, setSalaryToDate] = useState("");
+  const [historyRecords, setHistoryRecords] = useState([]);
+  const [historyRange, setHistoryRange] = useState("lastmonth");
+  const [historyFromDate, setHistoryFromDate] = useState("");
+  const [historyToDate, setHistoryToDate] = useState("");
 
   useEffect(() => {
     const syncDateStatus = async () => {
@@ -123,6 +127,83 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
 
     loadSalaryRecords();
   }, [salaryFromDate, salaryRange, salaryToDate]);
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const url = new URL("/api/admin/attendance", window.location.origin);
+        if (historyRange === "custom") {
+          if (!historyFromDate || !historyToDate) {
+            setHistoryRecords([]);
+            return;
+          }
+          url.searchParams.set("from", historyFromDate);
+          url.searchParams.set("to", historyToDate);
+        } else {
+          url.searchParams.set("range", historyRange);
+        }
+
+        const response = await fetch(url.toString(), { cache: "no-store" });
+        const result = await readResponsePayload(response);
+        if (!response.ok) {
+          throw new Error(result?.error || "Failed to load attendance history");
+        }
+        setHistoryRecords(result?.records || []);
+      } catch (error) {
+        console.error("Failed to load attendance history:", error);
+      }
+    };
+
+    loadHistory();
+  }, [historyFromDate, historyRange, historyToDate]);
+
+  const historyDates = useMemo(() => {
+    if (historyRange === "custom") {
+      if (!historyFromDate || !historyToDate) return [];
+      const start = new Date(`${historyFromDate}T00:00:00.000Z`);
+      const end = new Date(`${historyToDate}T00:00:00.000Z`);
+      const dates = [];
+      const current = new Date(start);
+      while (current <= end) {
+        dates.push(current.toISOString().slice(0, 10));
+        current.setUTCDate(current.getUTCDate() + 1);
+      }
+      return dates;
+    }
+
+    const end = new Date();
+    const start = new Date(end);
+    if (historyRange === "lastmonth") {
+      start.setMonth(start.getMonth() - 1);
+    } else if (historyRange === "last2months") {
+      start.setMonth(start.getMonth() - 2);
+    } else if (historyRange === "last3months") {
+      start.setMonth(start.getMonth() - 3);
+    } else {
+      start.setMonth(start.getMonth() - 1);
+    }
+
+    const dates = [];
+    const current = new Date(start);
+    while (current <= end) {
+      dates.push(current.toISOString().slice(0, 10));
+      current.setUTCDate(current.getUTCDate() + 1);
+    }
+    return dates;
+  }, [historyFromDate, historyRange, historyToDate]);
+
+  const historyByMechanic = useMemo(() => {
+    const grouped = new Map();
+    for (const record of historyRecords) {
+      const key = record.mechanicId;
+      if (!grouped.has(key)) {
+        grouped.set(key, new Map());
+      }
+      const dateKey = new Date(record.date).toISOString().slice(0, 10);
+      grouped.get(key).set(dateKey, record.status);
+    }
+    return grouped;
+  }, [historyRecords]);
 
   const salaryEstimates = useMemo(() => {
     const startDate = salaryRange === "custom" ? salaryFromDate : "";
@@ -270,6 +351,83 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
           >
             Download Attendance Excel
           </Button>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h4 className="text-lg font-semibold text-white">Attendance History</h4>
+            <p className="text-sm text-slate-300">Review attendance for the selected month or a custom date range.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={historyRange}
+              onChange={(e) => setHistoryRange(e.target.value)}
+              className="rounded-md border border-white/20 bg-slate-900 px-2 py-2 text-sm text-white"
+            >
+              <option value="lastmonth">Last Month</option>
+              <option value="last2months">Last 2 Months</option>
+              <option value="last3months">Last 3 Months</option>
+              <option value="custom">Custom</option>
+            </select>
+            {historyRange === "custom" && (
+              <>
+                <input
+                  type="date"
+                  value={historyFromDate}
+                  onChange={(e) => setHistoryFromDate(e.target.value)}
+                  className="rounded-md border border-white/20 bg-slate-900 px-2 py-2 text-sm text-white"
+                />
+                <input
+                  type="date"
+                  value={historyToDate}
+                  onChange={(e) => setHistoryToDate(e.target.value)}
+                  className="rounded-md border border-white/20 bg-slate-900 px-2 py-2 text-sm text-white"
+                />
+              </>
+            )}
+          </div>
+        </div>
+        <div className="mt-4 overflow-x-auto rounded-xl border border-white/10 bg-slate-950/40">
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/10 bg-white/5">
+                <th className="px-3 py-3 text-left font-semibold text-white">Mechanic</th>
+                {historyDates.map((date) => (
+                  <th key={date} className="px-3 py-3 text-center font-semibold text-slate-200">
+                    {format(new Date(`${date}T00:00:00.000Z`), "MMM d")}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {mechanics.map((mechanic) => {
+                const statusMap = historyByMechanic.get(mechanic.id) || new Map();
+                return (
+                  <tr key={mechanic.id} className="border-b border-white/5">
+                    <td className="px-3 py-3 font-medium text-white">{mechanic.name || "Unnamed mechanic"}</td>
+                    {historyDates.map((date) => {
+                      const status = statusMap.get(date);
+                      return (
+                        <td key={`${mechanic.id}-${date}`} className="px-3 py-3 text-center">
+                          {status === "PRESENT" ? (
+                            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">P</Badge>
+                          ) : status === "HALF_DAY" ? (
+                            <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">H</Badge>
+                          ) : status === "ABSENT" ? (
+                            <Badge className="bg-red-500/20 text-red-300 border-red-500/30">A</Badge>
+                          ) : (
+                            <Badge className="bg-slate-500/20 text-slate-200 border-slate-500/30">-</Badge>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
