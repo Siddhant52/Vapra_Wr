@@ -100,61 +100,62 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
     return { present, absent, halfDay, unmarked };
   }, [mechanicsWithStatus]);
 
-  useEffect(() => {
-    const loadSalaryRecords = async () => {
-      try {
-        const url = new URL("/api/admin/attendance", window.location.origin);
-        if (salaryRange === "custom") {
-          if (!salaryFromDate || !salaryToDate) {
-            setSalaryRecords([]);
-            return;
-          }
-          url.searchParams.set("from", salaryFromDate);
-          url.searchParams.set("to", salaryToDate);
+  // Fetch salary records for the selected salary range
+  const fetchSalaryRecords = async () => {
+    try {
+      const url = new URL("/api/admin/attendance", window.location.origin);
+      if (salaryRange === "custom") {
+        if (!salaryFromDate || !salaryToDate) {
+          setSalaryRecords([]);
+          return;
         }
-        url.searchParams.set("range", salaryRange);
-        const response = await fetch(url.toString(), { cache: "no-store" });
-        const result = await readResponsePayload(response);
-        if (!response.ok) {
-          throw new Error(result?.error || "Failed to load salary data");
-        }
-        setSalaryRecords(result?.records || []);
-      } catch (error) {
-        console.error("Failed to load salary records:", error);
-        setErrorMessage(error?.message || "Failed to load salary data");
+        url.searchParams.set("from", salaryFromDate);
+        url.searchParams.set("to", salaryToDate);
       }
-    };
+      url.searchParams.set("range", salaryRange);
+      const response = await fetch(url.toString(), { cache: "no-store" });
+      const result = await readResponsePayload(response);
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to load salary data");
+      }
+      setSalaryRecords(result?.records || []);
+    } catch (error) {
+      console.error("Failed to load salary records:", error);
+      setErrorMessage(error?.message || "Failed to load salary data");
+    }
+  };
 
-    loadSalaryRecords();
+  useEffect(() => {
+    fetchSalaryRecords();
   }, [salaryFromDate, salaryRange, salaryToDate]);
 
-  useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const url = new URL("/api/admin/attendance", window.location.origin);
-        if (historyRange === "custom") {
-          if (!historyFromDate || !historyToDate) {
-            setHistoryRecords([]);
-            return;
-          }
-          url.searchParams.set("from", historyFromDate);
-          url.searchParams.set("to", historyToDate);
-        } else {
-          url.searchParams.set("range", historyRange);
+  const fetchHistoryRecords = async () => {
+    try {
+      const url = new URL("/api/admin/attendance", window.location.origin);
+      if (historyRange === "custom") {
+        if (!historyFromDate || !historyToDate) {
+          setHistoryRecords([]);
+          return;
         }
-
-        const response = await fetch(url.toString(), { cache: "no-store" });
-        const result = await readResponsePayload(response);
-        if (!response.ok) {
-          throw new Error(result?.error || "Failed to load attendance history");
-        }
-        setHistoryRecords(result?.records || []);
-      } catch (error) {
-        console.error("Failed to load attendance history:", error);
+        url.searchParams.set("from", historyFromDate);
+        url.searchParams.set("to", historyToDate);
+      } else {
+        url.searchParams.set("range", historyRange);
       }
-    };
 
-    loadHistory();
+      const response = await fetch(url.toString(), { cache: "no-store" });
+      const result = await readResponsePayload(response);
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to load attendance history");
+      }
+      setHistoryRecords(result?.records || []);
+    } catch (error) {
+      console.error("Failed to load attendance history:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistoryRecords();
   }, [historyFromDate, historyRange, historyToDate]);
 
   const historyDates = useMemo(() => {
@@ -244,6 +245,12 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
           ...prev,
           [mechanicId]: status,
         }));
+        // refresh history and salary views immediately after marking
+        try {
+          await Promise.all([fetchHistoryRecords(), fetchSalaryRecords()]);
+        } catch (e) {
+          // ignore -- fetch functions already handle logging
+        }
       } catch (error) {
         console.error("Attendance update failed:", error);
         setErrorMessage(error?.message || "Failed to mark attendance");
@@ -256,6 +263,7 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
   const downloadAttendance = () => {
     const url = new URL("/api/admin/export-attendance", window.location.origin);
     url.searchParams.set("range", exportRange);
+    url.searchParams.set("dailyWage", String(dailyWage || 0));
     if (exportRange === "custom") {
       if (!exportFromDate || !exportToDate) {
         setErrorMessage("Please select both custom date range values for export.");
@@ -482,6 +490,7 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-emerald-300">₹{estimate.estimatedSalary.toLocaleString()}</p>
+                  <p className="text-xs text-slate-300">Current Total</p>
                   <p className="text-xs text-slate-400">{estimate.fullDays} full • {estimate.halfDays} half • {estimate.absentDays} absent</p>
                 </div>
               </div>

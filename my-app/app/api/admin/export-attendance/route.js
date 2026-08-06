@@ -77,10 +77,10 @@ export async function GET(request) {
     });
 
     const rows = records.map((r) => ({
-      AttendanceID: r.id || "",
+      ID: r.id || "",
       MechanicID: r.mechanicId || "",
-      MechanicName: r.mechanic?.name || "",
-      MechanicEmail: r.mechanic?.email || "",
+      Name: r.mechanic?.name || "",
+      Email: r.mechanic?.email || "",
       Specialty: r.mechanic?.specialty || "",
       Date: r.date ? new Date(r.date).toISOString().slice(0, 10) : "",
       Status: r.status || "",
@@ -90,12 +90,15 @@ export async function GET(request) {
       UpdatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : "",
     }));
 
+    const startDateStr = from || startDate.toISOString().slice(0, 10);
+    const endDateStr = to || endDate.toISOString().slice(0, 10);
+
     const salaryRows = calculateSalaryEstimates({
       mechanics,
       records,
       dailyWage,
-      startDate: from || "",
-      endDate: to || "",
+      startDate: startDateStr,
+      endDate: endDateStr,
     }).map((estimate) => ({
       MechanicName: estimate.name,
       Specialty: estimate.specialty,
