@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
 import { verifyAdmin } from "@/actions/admin";
 import { listAttendanceRecords } from "@/lib/attendance-store";
+import { calculateSalaryEstimates } from "@/lib/salary-estimation";
 import * as XLSX from "xlsx";
 
 function getRangeDates(range, from, to) {
@@ -17,8 +18,8 @@ function getRangeDates(range, from, to) {
   } else if (range === "last3months") {
     startDate.setMonth(startDate.getMonth() - 3);
   } else if (range === "custom" && from && to) {
-    startDate = new Date(from);
-    endDate = new Date(to);
+    startDate = new Date(`${from}T00:00:00.000Z`);
+    endDate = new Date(`${to}T23:59:59.999Z`);
   } else {
     startDate.setDate(startDate.getDate() - 1);
   }
@@ -41,6 +42,7 @@ export async function GET(request) {
     const range = url.searchParams.get("range") || "lastmonth";
     const from = url.searchParams.get("from");
     const to = url.searchParams.get("to");
+    const dailyWage = Number(url.searchParams.get("dailyWage") || 800);
     const { startDate, endDate } = getRangeDates(range, from, to);
 
     let records = [];
@@ -48,9 +50,9 @@ export async function GET(request) {
       records = await db.mechanicAttendance.findMany({
         where: { date: { gte: startDate, lte: endDate } },
         include: {
-          mechanic: { select: { name: true, email: true, specialty: true } },
+          mechanic: { select: { id: true, name: true, email: true, specialty: true } },
         },
-        orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+        orderBy: [{ date: "asc" }, { createdAt: "asc" }],
       });
     } else {
       const fallback = listAttendanceRecords({ startDate, endDate });
@@ -68,6 +70,12 @@ export async function GET(request) {
       }));
     }
 
+    const mechanics = await db.user.findMany({
+      where: { role: "MECHANIC" },
+      select: { id: true, name: true, specialty: true },
+      orderBy: { name: "asc" },
+    });
+
     const rows = records.map((r) => ({
       AttendanceID: r.id || "",
       MechanicID: r.mechanicId || "",
@@ -82,9 +90,27 @@ export async function GET(request) {
       UpdatedAt: r.updatedAt ? new Date(r.updatedAt).toISOString() : "",
     }));
 
+    const salaryRows = calculateSalaryEstimates({
+      mechanics,
+      records,
+      dailyWage,
+      startDate: from || "",
+      endDate: to || "",
+    }).map((estimate) => ({
+      MechanicName: estimate.name,
+      Specialty: estimate.specialty,
+      FullDays: estimate.fullDays,
+      HalfDays: estimate.halfDays,
+      AbsentDays: estimate.absentDays,
+      DailyWage: estimate.dailyWage,
+      EstimatedSalary: estimate.estimatedSalary,
+    }));
+
     const workbook = XLSX.utils.book_new();
-    const sheet = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(workbook, sheet, "Attendance");
+    const attendanceSheet = XLSX.utils.json_to_sheet(rows);
+    const salarySheet = XLSX.utils.json_to_sheet(salaryRows);
+    XLSX.utils.book_append_sheet(workbook, attendanceSheet, "Attendance");
+    XLSX.utils.book_append_sheet(workbook, salarySheet, "Salary Estimation");
     const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
 
     return new NextResponse(buffer, {
