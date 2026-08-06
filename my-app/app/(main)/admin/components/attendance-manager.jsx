@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { calculateSalaryEstimates } from "@/lib/salary-estimation";
 
 function toDateInputValue(date = new Date()) {
   const year = date.getFullYear();
@@ -36,6 +37,11 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
   const [pendingKey, setPendingKey] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [dailyWage, setDailyWage] = useState(800);
+  const [salaryRecords, setSalaryRecords] = useState([]);
+  const [salaryRange, setSalaryRange] = useState("currentMonth");
+  const [salaryFromDate, setSalaryFromDate] = useState("");
+  const [salaryToDate, setSalaryToDate] = useState("");
 
   useEffect(() => {
     const syncDateStatus = async () => {
@@ -77,16 +83,59 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
   const stats = useMemo(() => {
     let present = 0;
     let absent = 0;
+    let halfDay = 0;
     let unmarked = 0;
 
     for (const mechanic of mechanicsWithStatus) {
       if (mechanic.attendanceStatus === "PRESENT") present += 1;
+      else if (mechanic.attendanceStatus === "HALF_DAY") halfDay += 1;
       else if (mechanic.attendanceStatus === "ABSENT") absent += 1;
       else unmarked += 1;
     }
 
-    return { present, absent, unmarked };
+    return { present, absent, halfDay, unmarked };
   }, [mechanicsWithStatus]);
+
+  useEffect(() => {
+    const loadSalaryRecords = async () => {
+      try {
+        const url = new URL("/api/admin/attendance", window.location.origin);
+        if (salaryRange === "custom") {
+          if (!salaryFromDate || !salaryToDate) {
+            setSalaryRecords([]);
+            return;
+          }
+          url.searchParams.set("from", salaryFromDate);
+          url.searchParams.set("to", salaryToDate);
+        }
+        url.searchParams.set("range", salaryRange);
+        const response = await fetch(url.toString(), { cache: "no-store" });
+        const result = await readResponsePayload(response);
+        if (!response.ok) {
+          throw new Error(result?.error || "Failed to load salary data");
+        }
+        setSalaryRecords(result?.records || []);
+      } catch (error) {
+        console.error("Failed to load salary records:", error);
+        setErrorMessage(error?.message || "Failed to load salary data");
+      }
+    };
+
+    loadSalaryRecords();
+  }, [salaryFromDate, salaryRange, salaryToDate]);
+
+  const salaryEstimates = useMemo(() => {
+    const startDate = salaryRange === "custom" ? salaryFromDate : "";
+    const endDate = salaryRange === "custom" ? salaryToDate : "";
+
+    return calculateSalaryEstimates({
+      mechanics,
+      records: salaryRecords,
+      dailyWage,
+      startDate,
+      endDate,
+    });
+  }, [dailyWage, mechanics, salaryFromDate, salaryRecords, salaryToDate, salaryRange]);
 
   const handleMark = (mechanicId, status) => {
     setPendingKey(`${mechanicId}-${status}`);
@@ -176,6 +225,9 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
           <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
             Present: {stats.present}
           </Badge>
+          <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">
+            Half Day: {stats.halfDay}
+          </Badge>
           <Badge className="bg-red-500/20 text-red-300 border-red-500/30">
             Absent: {stats.absent}
           </Badge>
@@ -221,6 +273,65 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
         </div>
       </div>
 
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h4 className="text-lg font-semibold text-white">Salary Estimation</h4>
+            <p className="text-sm text-slate-300">Estimate payouts using present, half-day, and absent attendance.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="text-sm text-slate-200">Daily wage</label>
+            <input
+              type="number"
+              min="0"
+              value={dailyWage}
+              onChange={(e) => setDailyWage(Number(e.target.value) || 0)}
+              className="w-24 rounded-md border border-white/20 bg-slate-900 px-3 py-2 text-sm text-white"
+            />
+            <select
+              value={salaryRange}
+              onChange={(e) => setSalaryRange(e.target.value)}
+              className="rounded-md border border-white/20 bg-slate-900 px-2 py-2 text-sm text-white"
+            >
+              <option value="currentMonth">Current Month</option>
+              <option value="custom">Custom</option>
+            </select>
+            {salaryRange === "custom" && (
+              <>
+                <input
+                  type="date"
+                  value={salaryFromDate}
+                  onChange={(e) => setSalaryFromDate(e.target.value)}
+                  className="rounded-md border border-white/20 bg-slate-900 px-2 py-2 text-sm text-white"
+                />
+                <input
+                  type="date"
+                  value={salaryToDate}
+                  onChange={(e) => setSalaryToDate(e.target.value)}
+                  className="rounded-md border border-white/20 bg-slate-900 px-2 py-2 text-sm text-white"
+                />
+              </>
+            )}
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {salaryEstimates.map((estimate) => (
+            <div key={estimate.mechanicId} className="rounded-xl border border-white/10 bg-slate-950/50 p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-white">{estimate.name}</p>
+                  <p className="text-sm text-slate-400">{estimate.specialty}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-emerald-300">₹{estimate.estimatedSalary.toLocaleString()}</p>
+                  <p className="text-xs text-slate-400">{estimate.fullDays} full • {estimate.halfDays} half • {estimate.absentDays} absent</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
         <table className="w-full text-sm">
           <thead>
@@ -239,6 +350,8 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
                 <td className="py-4 px-6">
                   {mechanic.attendanceStatus === "PRESENT" ? (
                     <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">PRESENT</Badge>
+                  ) : mechanic.attendanceStatus === "HALF_DAY" ? (
+                    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30">HALF DAY</Badge>
                   ) : mechanic.attendanceStatus === "ABSENT" ? (
                     <Badge className="bg-red-500/20 text-red-300 border-red-500/30">ABSENT</Badge>
                   ) : (
@@ -255,6 +368,15 @@ export function AttendanceManager({ mechanics, attendanceEnabled }) {
                       onClick={() => handleMark(mechanic.id, "PRESENT")}
                     >
                       {pendingKey === `${mechanic.id}-PRESENT` ? "Saving..." : "Mark Present"}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="bg-amber-600 hover:bg-amber-700"
+                      disabled={isPending}
+                      onClick={() => handleMark(mechanic.id, "HALF_DAY")}
+                    >
+                      {pendingKey === `${mechanic.id}-HALF_DAY` ? "Saving..." : "Half Day"}
                     </Button>
                     <Button
                       type="button"
