@@ -8,13 +8,6 @@ import {
   smsBookingClosed,
   smsBookingCancelled,
 } from "@/lib/sms";
-import {
-  sendWhatsApp,
-  whatsappBookingReviewed,
-  whatsappBookingAssigned,
-  whatsappBookingClosed,
-  whatsappBookingCancelled,
-} from "@/lib/whatsapp";
 
 const VALID_STATUSES = ["PENDING", "REVIEWED", "ASSIGNED", "COMPLETED", "CLOSED", "CANCELLED"];
 
@@ -29,13 +22,11 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Verify admin access
     const adminUser = await db.user.findUnique({
       where: { clerkUserId: userId },
       select: { id: true, role: true, email: true },
     });
 
-    // Allow admin role OR allow-listed emails
     const { isAllowedAdminEmail } = await import("@/lib/admin-access");
     const isAdmin =
       adminUser?.role === "ADMIN" || isAllowedAdminEmail(adminUser?.email);
@@ -47,7 +38,6 @@ export async function PUT(req, { params }) {
       );
     }
 
-    // Await params in Next.js 16
     const { requestId } = await params;
 
     if (!requestId) {
@@ -64,7 +54,6 @@ export async function PUT(req, { params }) {
       );
     }
 
-    // Get current booking request
     const bookingRequest = await db.bookingRequest.findUnique({
       where: { id: requestId },
     });
@@ -78,13 +67,11 @@ export async function PUT(req, { params }) {
 
     const previousStatus = bookingRequest.status;
 
-    // Update status
     const updated = await db.bookingRequest.update({
       where: { id: requestId },
       data: { status },
     });
 
-    // Send SMS based on status transition
     if (updated.phone) {
       const smsData = {
         customerName: updated.customerName,
@@ -94,16 +81,12 @@ export async function PUT(req, { params }) {
 
       if (previousStatus === "PENDING" && status === "REVIEWED") {
         await sendSMS(updated.phone, smsBookingReviewed(smsData));
-        await sendWhatsApp(updated.phone, whatsappBookingReviewed(smsData));
       } else if (previousStatus === "REVIEWED" && status === "ASSIGNED") {
         await sendSMS(updated.phone, smsBookingAssigned(smsData));
-        await sendWhatsApp(updated.phone, whatsappBookingAssigned(smsData));
       } else if (status === "COMPLETED" || status === "CLOSED") {
         await sendSMS(updated.phone, smsBookingClosed(smsData));
-        await sendWhatsApp(updated.phone, whatsappBookingClosed(smsData));
       } else if (status === "CANCELLED") {
         await sendSMS(updated.phone, smsBookingCancelled(smsData));
-        await sendWhatsApp(updated.phone, whatsappBookingCancelled(smsData));
       }
     }
 

@@ -23,9 +23,9 @@ export const features = [
   },
   {
     icon: <MessageCircle className="h-6 w-6 text-emerald-400" />,
-    title: "WhatsApp Updates",
+    title: "SMS Updates",
     description:
-      "Get instant WhatsApp messages when your booking is created, reviewed, assigned to a mechanic, and completed.",
+      "Get instant SMS updates when your booking is created, reviewed, assigned to a mechanic, and completed.",
   },
   {
     icon: <CreditCard className="h-6 w-6 text-emerald-400" />,

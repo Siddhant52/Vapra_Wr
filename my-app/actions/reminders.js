@@ -2,12 +2,6 @@
 
 import { db as prisma } from "@/lib/prisma";
 import { sendSMS } from "@/lib/sms";
-import {
-  sendWhatsApp,
-  whatsappServiceDueReminder,
-  whatsappPostServiceCheckIn,
-  whatsappWinBack,
-} from "@/lib/whatsapp";
 
 const SERVICE_DUE_DAYS = 90;
 
@@ -25,7 +19,7 @@ export async function scheduleServiceDueReminder(vehicleId, userId) {
       vehicleId,
       userId,
       type: "SERVICE_DUE",
-      channel: "WHATSAPP",
+      channel: "SMS",
       scheduledAt: dueDate,
     },
   });
@@ -40,7 +34,7 @@ export async function schedulePostServiceCheckIn(vehicleId, userId) {
       vehicleId,
       userId,
       type: "POST_SERVICE_CHECKIN",
-      channel: "WHATSAPP",
+      channel: "SMS",
       scheduledAt,
     },
   });
@@ -71,7 +65,7 @@ export async function scheduleWinBackReminders() {
             vehicleId: v.id,
             userId: v.ownerId,
             type: "WIN_BACK",
-            channel: "WHATSAPP",
+            channel: "SMS",
             scheduledAt: new Date(),
           },
         })
@@ -99,33 +93,15 @@ export async function processDueReminders() {
   let sent = 0;
   let failed = 0;
 
-  const WHATSAPP_TEMPLATES = {
-    SERVICE_DUE: whatsappServiceDueReminder,
-    POST_SERVICE_CHECKIN: whatsappPostServiceCheckIn,
-    WIN_BACK: whatsappWinBack,
-  };
-
   for (const reminder of dueReminders) {
     try {
       const message = MESSAGES[reminder.type];
 
-      if (reminder.channel === "SMS" || reminder.channel === "BOTH") {
+      if (reminder.channel === "SMS" || reminder.channel === "BOTH" || reminder.channel === "WHATSAPP") {
         if (reminder.user.phone) {
           await sendSMS(reminder.user.phone, message);
         }
       }
-
-      if (reminder.channel === "WHATSAPP" || reminder.channel === "BOTH") {
-        if (reminder.user.phone) {
-          const templateFn = WHATSAPP_TEMPLATES[reminder.type];
-          const waMessage = templateFn
-            ? templateFn({ customerName: reminder.user.name })
-            : message;
-          await sendWhatsApp(reminder.user.phone, waMessage);
-        }
-      }
-      // Email channel: wire up your email provider here if you have one.
-      // (No existing email-sending helper was found in lib/ — flag if you have one elsewhere.)
 
       await prisma.followUpReminder.update({
         where: { id: reminder.id },

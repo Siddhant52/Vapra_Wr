@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ManageMechanics } from "@/app/(main)/admin/components/manage-mechanics";
 import { ServiceRequestsManager } from "@/app/(main)/admin/components/service-requests-manager";
 import { AttendanceManager } from "@/app/(main)/admin/components/attendance-manager";
-import { WhatsAppBroadcast } from "@/app/(main)/admin/components/whatsapp-broadcast";
+import { SMSBroadcast } from "@/app/(main)/admin/components/whatsapp-broadcast";
 import { db } from "@/lib/prisma";
 import { listAttendanceRecords } from "@/lib/attendance-store";
 import { getWhatsAppAudienceStats } from "@/actions/whatsapp-offers";
@@ -132,8 +132,8 @@ export default async function AdminPage() {
                 <TabsTrigger value="requests" className="rounded-lg md:rounded-xl data-[state=active]:bg-emerald-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
                   Requests
                 </TabsTrigger>
-                <TabsTrigger value="whatsapp" className="rounded-lg md:rounded-xl data-[state=active]:bg-green-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
-                  WhatsApp
+                <TabsTrigger value="sms" className="rounded-lg md:rounded-xl data-[state=active]:bg-green-500 data-[state=active]:shadow-lg h-10 md:h-16 text-xs md:text-sm">
+                  SMS
                 </TabsTrigger>
               </TabsList>
 
@@ -205,8 +205,8 @@ export default async function AdminPage() {
                 <ServiceRequestsManager requests={serviceRequests} />
               </TabsContent>
 
-              <TabsContent value="whatsapp" className="mt-0">
-                <WhatsAppBroadcast audienceStats={whatsAppAudienceStats} />
+              <TabsContent value="sms" className="mt-0">
+                <SMSBroadcast audienceStats={whatsAppAudienceStats} />
               </TabsContent>
             </Tabs>
           </div>
