@@ -117,11 +117,17 @@ export function smsBookingCancelled({ customerName, serviceName }) {
   return `Hi ${name}, your booking request for ${serviceName} at Vapra Workshop has been cancelled. Please contact us if you need help rescheduling.`;
 }
 
-export function buildSmsOfferMessage({ customerName, title, offerText }) {
+export function buildSmsOfferMessage({ customerName, title, offerText, imageUrl }) {
   const name = customerName || "there";
   const parts = [];
   if (title) parts.push(`${title}`, "");
-  parts.push(`Hi ${name}! ${offerText}`, "", "— Team Vapra Workshop", "", "Reply STOP to unsubscribe from offers.");
+  parts.push(`Hi ${name}! ${offerText}`);
+
+  if (imageUrl) {
+    parts.push("", `Image: ${imageUrl}`);
+  }
+
+  parts.push("", "— Team Vapra Workshop", "", "Reply STOP to unsubscribe from offers.");
   return parts.join("\n");
 }
 
