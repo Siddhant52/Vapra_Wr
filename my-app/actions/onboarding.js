@@ -105,25 +105,25 @@ async function setRole({ userId, clerkUser, role }) {
  * Get complete user profile
  */
 export async function getCurrentUser() {
-  const { userId } = await auth();
-
-  if (!userId) {
-    return null;
-  }
-
-  const clerkUser = await currentUser();
-  if (!clerkUser) {
-    return null;
-  }
-
-  const email = clerkUser.emailAddresses[0]?.emailAddress;
-  const isAdminEmail = isAllowedAdminEmail(email);
-
-  // Keep role if already set, otherwise set CUSTOMER by default (or ADMIN if allow-listed).
-  const existingUser = await db.user.findUnique({ where: { clerkUserId: userId } });
-  const resolvedRole = isAdminEmail ? "ADMIN" : existingUser?.role || "CUSTOMER";
-
   try {
+    const { userId } = await auth();
+
+    if (!userId) {
+      return null;
+    }
+
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
+      return null;
+    }
+
+    const email = clerkUser.emailAddresses?.[0]?.emailAddress;
+    const isAdminEmail = isAllowedAdminEmail(email);
+
+    // Keep role if already set, otherwise set CUSTOMER by default (or ADMIN if allow-listed).
+    const existingUser = await db.user.findUnique({ where: { clerkUserId: userId } });
+    const resolvedRole = isAdminEmail ? "ADMIN" : existingUser?.role || "CUSTOMER";
+
     let user = await db.user.upsert({
       where: { clerkUserId: userId },
       update: {
@@ -152,13 +152,7 @@ export async function getCurrentUser() {
     };
   } catch (error) {
     console.error("Get user failed:", error);
-    // Fallback for DB outage
-    return {
-      clerkUserId: userId,
-      email,
-      name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim(),
-      role: isAdminEmail ? "ADMIN" : "CUSTOMER",
-    };
+    return null;
   }
 }
 

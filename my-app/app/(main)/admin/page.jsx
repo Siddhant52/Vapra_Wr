@@ -17,41 +17,66 @@ export default async function AdminPage() {
   const attendanceDate = new Date();
   attendanceDate.setHours(0, 0, 0, 0);
 
-  const [mechanics, serviceRequests] = await Promise.all([
-    db.user.findMany({
-      where: { role: "MECHANIC" },
-      select: {
-        id: true,
-        name: true,
-        specialty: true,
-        experience: true,
-        verificationStatus: true,
-        createdAt: true,
-      },
-      orderBy: { createdAt: "desc" },
-    }),
-    db.bookingRequest.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 30,
-    }),
-  ]);
+  let mechanics = [];
+  let serviceRequests = [];
+  let attendanceRecords = [];
+  let attendanceEnabled = false;
+  let totalRevenueAgg = { _sum: { amount: null } };
+  let whatsAppAudienceStats = {
+    totalCustomers: 0,
+    reachableCustomers: 0,
+    optedOutCustomers: 0,
+  };
 
-  const attendanceEnabled = !!db.mechanicAttendance;
-  const attendanceRecords = attendanceEnabled
-    ? await db.mechanicAttendance.findMany({
-        where: { date: attendanceDate },
+  try {
+    const [mechanicsResult, serviceRequestsResult] = await Promise.all([
+      db.user.findMany({
+        where: { role: "MECHANIC" },
         select: {
           id: true,
-          mechanicId: true,
-          status: true,
-          date: true,
-          note: true,
-          markedById: true,
+          name: true,
+          specialty: true,
+          experience: true,
+          verificationStatus: true,
           createdAt: true,
-          updatedAt: true,
         },
-      })
-    : listAttendanceRecords({ startDate: attendanceDate, endDate: attendanceDate });
+        orderBy: { createdAt: "desc" },
+      }),
+      db.bookingRequest.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 30,
+      }),
+    ]);
+
+    mechanics = mechanicsResult;
+    serviceRequests = serviceRequestsResult;
+
+    attendanceEnabled = !!db.mechanicAttendance;
+    attendanceRecords = attendanceEnabled
+      ? await db.mechanicAttendance.findMany({
+          where: { date: attendanceDate },
+          select: {
+            id: true,
+            mechanicId: true,
+            status: true,
+            date: true,
+            note: true,
+            markedById: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        })
+      : listAttendanceRecords({ startDate: attendanceDate, endDate: attendanceDate });
+
+    totalRevenueAgg = await db.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: "PAID" },
+    });
+
+    whatsAppAudienceStats = await getWhatsAppAudienceStats();
+  } catch (error) {
+    console.error("Failed to load admin dashboard data:", error);
+  }
 
   const attendanceMap = new Map(
     attendanceRecords.map((record) => [record.mechanicId, record.status])
@@ -61,13 +86,6 @@ export default async function AdminPage() {
     ...mechanic,
     attendanceStatus: attendanceMap.get(mechanic.id) || null,
   }));
-
-  const totalRevenueAgg = await db.payment.aggregate({
-    _sum: { amount: true },
-    where: { status: "PAID" },
-  });
-
-  const whatsAppAudienceStats = await getWhatsAppAudienceStats();
 
   const dashboardStats = {
     totalMechanics: mechanics.length,
