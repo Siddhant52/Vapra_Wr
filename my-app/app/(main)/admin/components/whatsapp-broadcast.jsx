@@ -32,7 +32,11 @@ export function SMSBroadcast({ audienceStats }) {
       const formData = new FormData();
       formData.set("image", file);
       const res = await uploadSmsBroadcastImage(formData);
-      setImageUrl(res.url);
+      if (res?.error) {
+        setErrorMessage(res.error);
+      } else if (res?.url) {
+        setImageUrl(res.url);
+      }
     } catch (error) {
       setErrorMessage(error?.message || "Failed to upload image");
     } finally {

@@ -32,21 +32,24 @@ export async function getWhatsAppAudienceStats() {
 
 export async function uploadSmsBroadcastImage(formData) {
   const isAdmin = await verifyAdmin();
-  if (!isAdmin) throw new Error("Unauthorized");
+  if (!isAdmin) return { error: "Unauthorized" };
 
   const file = formData.get("image");
   if (!file || typeof file === "string") {
-    throw new Error("No image was provided");
+    return { error: "No image was provided" };
   }
   if (!file.type || !file.type.startsWith("image/")) {
-    throw new Error("File must be an image (JPEG, PNG, etc.)");
+    return { error: "File must be an image (JPEG, PNG, etc.)" };
   }
   if (file.size > MAX_IMAGE_BYTES) {
-    throw new Error("Image must be under 5MB");
+    return { error: "Image must be under 5MB" };
   }
 
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    throw new Error("Image uploads aren't configured yet — connect a Vercel Blob store to this project.");
+    console.error(
+      "[SMS broadcast upload] BLOB_READ_WRITE_TOKEN is not set — connect a Vercel Blob store to this project (Vercel dashboard → Storage → Blob) and add the token to your environment variables."
+    );
+    return { error: "Image uploads aren't configured yet — connect a Vercel Blob store to this project." };
   }
 
   try {
@@ -58,7 +61,7 @@ export async function uploadSmsBroadcastImage(formData) {
     return { url: blob.url };
   } catch (error) {
     console.error("Failed to upload SMS broadcast image:", error);
-    throw new Error("Failed to upload image. Please try again.");
+    return { error: "Failed to upload image. Please try again." };
   }
 }
 
