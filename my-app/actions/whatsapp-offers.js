@@ -30,6 +30,28 @@ export async function getWhatsAppAudienceStats() {
   }
 }
 
+/**
+ * Returns the actual list of customers who can currently receive a
+ * broadcast (phone on file, not opted out), so the admin can pick specific
+ * recipients instead of only sending to everyone.
+ */
+export async function getBroadcastableCustomers() {
+  const isAdmin = await verifyAdmin();
+  if (!isAdmin) return [];
+
+  try {
+    const customers = await db.user.findMany({
+      where: { role: "CUSTOMER", phone: { not: null }, whatsappOptOut: false },
+      select: { id: true, name: true, phone: true },
+      orderBy: { name: "asc" },
+    });
+    return customers;
+  } catch (error) {
+    console.error("Failed to fetch broadcastable customers:", error);
+    return [];
+  }
+}
+
 export async function uploadSmsBroadcastImage(formData) {
   const isAdmin = await verifyAdmin();
   if (!isAdmin) return { error: "Unauthorized" };
@@ -66,30 +88,54 @@ export async function uploadSmsBroadcastImage(formData) {
 }
 
 /**
- * Admin-only: broadcast a promotional SMS to all customers who have a phone
- * number on file and have not opted out.
+ * Admin-only: send a promotional SMS either to a specific list of selected
+ * customers, or to every reachable customer (phone on file, not opted out).
+ *
+ * formData:
+ *   - title, offerText, imageUrl: message content (same as before)
+ *   - mode: "all" | "selected"
+ *   - customerIds: JSON-stringified array of user IDs, required when mode is "selected"
  */
 export async function sendWhatsAppOfferBroadcast(formData) {
   const isAdmin = await verifyAdmin();
-  if (!isAdmin) throw new Error("Unauthorized");
+  if (!isAdmin) return { error: "Unauthorized" };
 
   const title = (formData.get("title") || "").toString().trim();
   const offerText = (formData.get("offerText") || "").toString().trim();
   const imageUrl = (formData.get("imageUrl") || "").toString().trim();
+  const mode = (formData.get("mode") || "all").toString();
+  const customerIdsRaw = (formData.get("customerIds") || "[]").toString();
 
   if (!offerText) {
-    throw new Error("Offer message cannot be empty");
+    return { error: "Offer message cannot be empty" };
   }
   if (offerText.length > 900) {
-    throw new Error("Offer message is too long (max 900 characters)");
+    return { error: "Offer message is too long (max 900 characters)" };
   }
   if (title.length > 100) {
-    throw new Error("Title is too long (max 100 characters)");
+    return { error: "Title is too long (max 100 characters)" };
+  }
+
+  let customerIds = [];
+  if (mode === "selected") {
+    try {
+      customerIds = JSON.parse(customerIdsRaw);
+    } catch {
+      return { error: "Invalid recipient selection" };
+    }
+    if (!Array.isArray(customerIds) || customerIds.length === 0) {
+      return { error: "Select at least one customer, or choose \"Broadcast to All\"." };
+    }
   }
 
   try {
+    const where =
+      mode === "selected"
+        ? { id: { in: customerIds }, role: "CUSTOMER", phone: { not: null }, whatsappOptOut: false }
+        : { role: "CUSTOMER", phone: { not: null }, whatsappOptOut: false };
+
     const customers = await db.user.findMany({
-      where: { role: "CUSTOMER", phone: { not: null }, whatsappOptOut: false },
+      where,
       select: { name: true, phone: true },
     });
 
@@ -115,6 +161,6 @@ export async function sendWhatsAppOfferBroadcast(formData) {
     return { success: true, sent, failed, total: customers.length };
   } catch (error) {
     console.error("Failed to send SMS offer broadcast:", error);
-    throw new Error(`Failed to send broadcast: ${error.message}`);
+    return { error: `Failed to send broadcast: ${error.message}` };
   }
 }

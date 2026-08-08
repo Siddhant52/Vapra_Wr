@@ -1,10 +1,14 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ImagePlus, Loader2, Send, X } from "lucide-react";
-import { sendWhatsAppOfferBroadcast, uploadSmsBroadcastImage } from "@/actions/whatsapp-offers";
+import { ImagePlus, Loader2, Megaphone, Send, Users, X } from "lucide-react";
+import {
+  getBroadcastableCustomers,
+  sendWhatsAppOfferBroadcast,
+  uploadSmsBroadcastImage,
+} from "@/actions/whatsapp-offers";
 
 const TITLE_LIMIT = 100;
 const BODY_LIMIT = 900;
@@ -16,8 +20,38 @@ export function SMSBroadcast({ audienceStats }) {
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [sendMode, setSendMode] = useState(null); // "selected" | "all" | null while sending
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
+
+  const [customers, setCustomers] = useState([]);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    getBroadcastableCustomers().then((list) => {
+      if (!cancelled) {
+        setCustomers(list);
+        setIsLoadingCustomers(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const toggleCustomer = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => setSelectedIds(new Set(customers.map((c) => c.id)));
+  const selectNone = () => setSelectedIds(new Set());
 
   const handlePickImage = () => fileInputRef.current?.click();
 
@@ -44,14 +78,19 @@ export function SMSBroadcast({ audienceStats }) {
     }
   };
 
-  const handleSend = () => {
+  const handleSend = (mode) => {
     if (!offerText.trim()) {
       setErrorMessage("Please write a message before sending.");
+      return;
+    }
+    if (mode === "selected" && selectedIds.size === 0) {
+      setErrorMessage("Select at least one customer, or use \"Broadcast to All\" instead.");
       return;
     }
 
     setErrorMessage("");
     setResult(null);
+    setSendMode(mode);
 
     startTransition(async () => {
       try {
@@ -59,18 +98,30 @@ export function SMSBroadcast({ audienceStats }) {
         formData.set("title", title.trim());
         formData.set("offerText", offerText.trim());
         formData.set("imageUrl", imageUrl);
+        formData.set("mode", mode);
+        if (mode === "selected") {
+          formData.set("customerIds", JSON.stringify(Array.from(selectedIds)));
+        }
         const res = await sendWhatsAppOfferBroadcast(formData);
+        if (res?.error) {
+          setErrorMessage(res.error);
+          return;
+        }
         setResult(res);
         setTitle("");
         setOfferText("");
         setImageUrl("");
+        selectNone();
       } catch (error) {
         setErrorMessage(error?.message || "Failed to send broadcast");
+      } finally {
+        setSendMode(null);
       }
     });
   };
 
   const hasContent = title.trim() || offerText.trim() || imageUrl;
+  const selectedCount = selectedIds.size;
 
   return (
     <div className="space-y-6">
@@ -81,27 +132,82 @@ export function SMSBroadcast({ audienceStats }) {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <div>
-              <h3 className="text-xl font-bold text-white">New SMS Broadcast</h3>
-              <p className="text-sm text-slate-300 mt-1">
-                Send a short offer or reminder to every customer with a phone number on file.
-              </p>
-            </div>
-            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 whitespace-nowrap">
-              {audienceStats.reachableCustomers} of {audienceStats.totalCustomers} reachable
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Recipient picker */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-1">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h3 className="text-base font-bold text-white flex items-center gap-1.5">
+              <Users className="h-4 w-4 text-emerald-400" />
+              Recipients
+            </h3>
+            <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 whitespace-nowrap text-xs">
+              {audienceStats.reachableCustomers} reachable
             </Badge>
           </div>
 
           {audienceStats.optedOutCustomers > 0 && (
-            <p className="text-xs text-slate-400 mb-4">
+            <p className="text-xs text-slate-400 mb-3">
               {audienceStats.optedOutCustomers} customer
-              {audienceStats.optedOutCustomers === 1 ? "" : "s"} unsubscribed
-              via &quot;STOP&quot; and won&apos;t receive broadcasts.
+              {audienceStats.optedOutCustomers === 1 ? "" : "s"} unsubscribed via &quot;STOP&quot;.
             </p>
           )}
+
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              type="button"
+              onClick={selectAll}
+              className="text-xs text-emerald-300 hover:text-emerald-200 underline underline-offset-2"
+            >
+              Select all
+            </button>
+            <span className="text-slate-600 text-xs">·</span>
+            <button
+              type="button"
+              onClick={selectNone}
+              className="text-xs text-slate-400 hover:text-slate-300 underline underline-offset-2"
+            >
+              Clear
+            </button>
+            <span className="ml-auto text-xs text-slate-400">{selectedCount} selected</span>
+          </div>
+
+          <div className="max-h-72 overflow-y-auto rounded-xl border border-white/10 bg-slate-950/40 divide-y divide-white/5">
+            {isLoadingCustomers ? (
+              <div className="flex items-center justify-center py-8 text-slate-500 text-sm gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading customers...
+              </div>
+            ) : customers.length === 0 ? (
+              <p className="text-sm text-slate-500 text-center py-8 px-3">
+                No reachable customers yet.
+              </p>
+            ) : (
+              customers.map((customer) => (
+                <label
+                  key={customer.id}
+                  className="flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(customer.id)}
+                    onChange={() => toggleCustomer(customer.id)}
+                    className="h-4 w-4 shrink-0 rounded border-white/20 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-0 cursor-pointer"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm text-white truncate">{customer.name || "Unnamed customer"}</p>
+                    <p className="text-xs text-slate-400 truncate">{customer.phone}</p>
+                  </div>
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Compose */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-1">
+          <h3 className="text-xl font-bold text-white mb-1">New SMS Broadcast</h3>
+          <p className="text-sm text-slate-300 mb-4">
+            Write your message, then choose who receives it.
+          </p>
 
           {errorMessage && (
             <div className="rounded-xl border border-red-600/30 bg-red-950/30 p-3 text-sm text-red-200 mb-4">
@@ -163,29 +269,49 @@ export function SMSBroadcast({ audienceStats }) {
             className="w-full rounded-xl border border-white/20 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             disabled={isPending}
           />
-          <div className="mt-2 flex items-center justify-between">
+          <div className="mt-2 mb-4">
             <span className="text-xs text-slate-400">
               {offerText.length} / {BODY_LIMIT}
             </span>
+          </div>
+
+          <div className="space-y-2">
             <Button
               type="button"
-              className="bg-emerald-600 hover:bg-emerald-700"
-              disabled={isPending || !offerText.trim()}
-              onClick={handleSend}
+              variant="outline"
+              className="w-full border-emerald-600/40 text-emerald-300 hover:bg-emerald-950/40 hover:text-emerald-200"
+              disabled={isPending || !offerText.trim() || selectedCount === 0}
+              onClick={() => handleSend("selected")}
             >
-              {isPending ? (
+              {isPending && sendMode === "selected" ? (
                 "Sending..."
               ) : (
                 <>
                   <Send className="h-4 w-4 mr-1.5" />
-                  Send to {audienceStats.reachableCustomers} customers
+                  Send to Selected ({selectedCount})
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              className="w-full bg-emerald-600 hover:bg-emerald-700"
+              disabled={isPending || !offerText.trim() || audienceStats.reachableCustomers === 0}
+              onClick={() => handleSend("all")}
+            >
+              {isPending && sendMode === "all" ? (
+                "Sending..."
+              ) : (
+                <>
+                  <Megaphone className="h-4 w-4 mr-1.5" />
+                  Broadcast to All ({audienceStats.reachableCustomers})
                 </>
               )}
             </Button>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        {/* Preview */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-1">
           <h4 className="text-sm font-semibold text-slate-300 mb-3">
             What customers will receive
           </h4>
