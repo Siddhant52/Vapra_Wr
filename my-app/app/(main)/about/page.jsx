@@ -5,15 +5,19 @@ import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { Wrench, Clock, MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { Reveal, StaggerGroup, StaggerItem } from "@/components/motion/reveal";
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 space-y-12">
+      <Reveal y={16} duration={0.4}>
       <PageHeader
         title="About Vapra Workshop"
         description="Serving Bikaner with trusted automotive repair and service since July 2013."
       />
+      </Reveal>
 
+      <Reveal>
       <section className="grid gap-8 md:grid-cols-2 items-start">
         <Card className="border-emerald-900/20">
           <CardHeader>
@@ -94,7 +98,9 @@ export default function AboutPage() {
           </CardContent>
         </Card>
       </section>
+      </Reveal>
 
+      <Reveal delay={0.1}>
       <section className="grid gap-8 md:grid-cols-2">
         <Card className="border-emerald-900/20">
           <CardHeader>
@@ -177,8 +183,10 @@ export default function AboutPage() {
           </CardContent>
         </Card>
       </section>
+      </Reveal>
 
-      <section className="grid gap-8 md:grid-cols-3">
+      <StaggerGroup className="grid gap-8 md:grid-cols-3">
+        <StaggerItem>
         <Card className="border-emerald-900/20">
           <CardHeader>
             <CardTitle className="text-white">
@@ -194,7 +202,9 @@ export default function AboutPage() {
             </p>
           </CardContent>
         </Card>
+        </StaggerItem>
 
+        <StaggerItem>
         <Card className="border-emerald-900/20">
           <CardHeader>
             <CardTitle className="text-white">
@@ -209,7 +219,9 @@ export default function AboutPage() {
             </p>
           </CardContent>
         </Card>
+        </StaggerItem>
 
+        <StaggerItem>
         <Card className="border-emerald-900/20">
           <CardHeader>
             <CardTitle className="text-white">
@@ -224,7 +236,8 @@ export default function AboutPage() {
             </p>
           </CardContent>
         </Card>
-      </section>
+        </StaggerItem>
+      </StaggerGroup>
     </div>
   );
 }

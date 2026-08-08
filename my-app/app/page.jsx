@@ -13,6 +13,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/actions/onboarding";
 import TrackAppointmentButton from "@/components/track-appointment-button";
 import SliderBanner from "@/components/slider-banner";
+import { Reveal, StaggerGroup, StaggerItem } from "@/components/motion/reveal";
 
 const HERO_IMAGES = [
   "vapra1.jpeg",
@@ -46,7 +47,7 @@ export default async function Home() {
       <section className="relative overflow-hidden py-16 md:py-24 lg:py-32 pt-24 md:pt-28 lg:pt-32">
         <div className="container mx-auto px-3 md:px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center">
-            <div className="space-y-4 md:space-y-6 lg:space-y-8">
+            <Reveal as="div" y={20} duration={0.6} className="space-y-4 md:space-y-6 lg:space-y-8">
               <Badge
                 variant="outline"
                 className="bg-orange-900/30 border-orange-700/30 px-3 md:px-4 py-1.5 md:py-2 text-orange-400 text-xs md:text-sm font-medium w-fit"
@@ -88,7 +89,7 @@ export default async function Home() {
                   <Link href={secondaryHref}>{secondaryLabel}</Link>
                 </Button>
               </div>
-            </div>
+            </Reveal>
             <SliderBanner
               images={HERO_IMAGES}
               interval={4200}
@@ -101,6 +102,7 @@ export default async function Home() {
 
       <section className="py-12 md:py-16 lg:py-20 bg-muted/30">
         <div className="container mx-auto px-3 md:px-4">
+          <Reveal>
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 md:mb-4">
               How It Works
@@ -109,11 +111,12 @@ export default async function Home() {
               Getting your vehicle serviced with us takes just a few clicks.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+          </Reveal>
+          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {features.map((feature, index) => {
               return (
+                <StaggerItem key={index} className="h-full">
                 <Card
-                  key={index}
                   className="border-orange-900/20 hover:border-orange-800/40 transition-all duration-300 flex flex-col h-full"
                 >
                   <CardHeader className="pb-2 sm:pb-3">
@@ -130,14 +133,16 @@ export default async function Home() {
                     </p>
                   </CardContent>
                 </Card>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerGroup>
         </div>
       </section>
 
       <section className="py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-3 md:px-4">
+          <Reveal>
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <Badge
               className="bg-orange-900/30 border-orange-700/30 px-3 md:px-4 py-1.5 md:py-1 text-orange-400 text-xs md:text-sm font-medium mb-3 md:mb-4 w-fit mx-auto"
@@ -151,14 +156,15 @@ export default async function Home() {
               Choose the perfect service plan that fits your vehicle's needs.
             </p>
           </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {servicePlans.map((plan) => (
+              <StaggerItem key={plan.name} className="h-full">
               <Card
-                key={plan.name}
                 className={`flex flex-col h-full border transition-all ${
                   plan.popular
-                    ? "border-emerald-600/60 shadow-lg shadow-emerald-600/20 lg:scale-105"
+                    ? "border-emerald-600/60 shadow-lg shadow-emerald-600/20 lg:scale-105 hover:lg:scale-105"
                     : "border-emerald-900/20 hover:border-emerald-900/40"
                 }`}
               >
@@ -194,14 +200,16 @@ export default async function Home() {
                   </Button>
                 </CardContent>
               </Card>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
 
         </div>
       </section>
 
       <section className="py-12 md:py-16 lg:py-20 bg-muted/30">
         <div className="container mx-auto px-3 md:px-4">
+          <Reveal>
           <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <Badge
               variant="outline"
@@ -216,11 +224,12 @@ export default async function Home() {
               Hear from people who use our platform
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+          </Reveal>
+          <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
             {testimonials.map((testimonial, index) => {
               return (
+                <StaggerItem key={index} className="h-full">
                 <Card
-                  key={index}
                   className="border-orange-900/20 hover:border-orange-800/40 transition-all duration-300 flex flex-col h-full"
                 >
                   <CardContent className="pt-4 md:pt-6 flex flex-col justify-between h-full">
@@ -247,14 +256,16 @@ export default async function Home() {
                     </p>
                   </CardContent>
                 </Card>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerGroup>
         </div>
       </section>
 
       <section className="py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-3 md:px-4">
+          <Reveal>
           <Card className="bg-gradient-to-r from-orange-900/30 to-orange-950/20 border-orange-800/20">
             <CardContent className="p-6 md:p-8 lg:p-12 relative overflow-hidden">
               <div>
@@ -286,6 +297,7 @@ export default async function Home() {
               </div>
             </CardContent>
           </Card>
+          </Reveal>
         </div>
       </section>
     </div>

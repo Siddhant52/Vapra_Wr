@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Minus } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { loadRazorpayScript } from "@/components/razorpay-checkout-loader";
+import { Reveal, StaggerGroup, StaggerItem } from "@/components/motion/reveal";
 
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState(null);
@@ -68,6 +69,12 @@ export default function PricingPage() {
       ],
     },
   ];
+
+  // Standard and Premium are each a strict superset of the tier below —
+  // so the full Premium list doubles as the master row list. Rendering
+  // every row on every card (checked vs. greyed-out) keeps all three
+  // cards visually even regardless of how many features a tier includes.
+  const masterFeatures = packages[2].features;
 
   const handleBooking = () => {
     router.push("/onboarding");
@@ -164,10 +171,12 @@ export default function PricingPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 lg:py-16 space-y-8 md:space-y-12">
+      <Reveal y={16} duration={0.4}>
       <PageHeader 
         title="Our Service Pricing"
         description="Transparent pricing for quality automotive services at Vapra Workshop"
       />
+      </Reveal>
       <div className="text-xs sm:text-sm text-emerald-300 mb-4 md:mb-6 max-w-2xl">
         Secure Razorpay Standard Checkout is available for customers who sign in before purchase.
       </div>
@@ -179,13 +188,13 @@ export default function PricingPage() {
       ) : null}
 
       {/* Pricing Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch">
+      <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch">
         {packages.map((pkg, idx) => (
+          <StaggerItem key={idx}>
           <Card
-            key={idx}
             className={`relative flex h-full flex-col border transition-all ${
               pkg.popular
-                ? "border-emerald-600/60 shadow-lg shadow-emerald-600/20 lg:scale-105"
+                ? "border-emerald-600/60 shadow-lg shadow-emerald-600/20 lg:scale-105 hover:lg:scale-105"
                 : "border-emerald-900/20 hover:border-emerald-900/40"
             }`}
           >
@@ -207,12 +216,30 @@ export default function PricingPage() {
 
             <CardContent className="flex h-full flex-col justify-between space-y-4 sm:space-y-6">
               <ul className="space-y-2 sm:space-y-3">
-                {pkg.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-2 sm:gap-3">
-                    <Check className="mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 text-emerald-400 shrink-0" />
-                    <span className="text-xs sm:text-sm text-gray-300">{feature}</span>
-                  </li>
-                ))}
+                {masterFeatures.map((feature, featureIdx) => {
+                  const included = featureIdx < pkg.features.length;
+                  return (
+                    <li
+                      key={featureIdx}
+                      className={`flex items-start gap-2 sm:gap-3 ${
+                        included ? "" : "opacity-35"
+                      }`}
+                    >
+                      {included ? (
+                        <Check className="mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 text-emerald-400 shrink-0" />
+                      ) : (
+                        <Minus className="mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 text-gray-500 shrink-0" />
+                      )}
+                      <span
+                        className={`text-xs sm:text-sm ${
+                          included ? "text-gray-300" : "text-gray-500 line-through"
+                        }`}
+                      >
+                        {feature}
+                      </span>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="space-y-2 sm:space-y-3">
@@ -233,10 +260,12 @@ export default function PricingPage() {
               </div>
             </CardContent>
           </Card>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerGroup>
 
       {/* Info Section */}
+      <Reveal>
       <Card className="border-emerald-900/20">
         <CardHeader className="pb-3 sm:pb-4">
           <CardTitle className="text-lg sm:text-xl">Why Choose Vapra Workshop?</CardTitle>
@@ -271,8 +300,10 @@ export default function PricingPage() {
           </div>
         </CardContent>
       </Card>
+      </Reveal>
 
       {/* CTA Section */}
+      <Reveal delay={0.1}>
       <div className="bg-emerald-900/20 border border-emerald-600/20 rounded-lg p-6 sm:p-8 text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Ready to Book Your Service?</h2>
         <p className="text-xs sm:text-base text-gray-300 mb-4 sm:mb-6">
@@ -286,6 +317,7 @@ export default function PricingPage() {
           Browse All Services
         </Button>
       </div>
+      </Reveal>
       </div>
   );
 }
