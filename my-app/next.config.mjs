@@ -48,6 +48,15 @@ const nextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  experimental: {
+    serverActions: {
+      // Matches MAX_IMAGE_BYTES in actions/whatsapp-offers.js (5MB), plus
+      // headroom for multipart/form-data encoding overhead. Next.js's
+      // default Server Action limit is only 1MB, which was silently
+      // rejecting broadcast image uploads before this code ever ran.
+      bodySizeLimit: "6mb",
+    },
+  },
   async headers() {
     return [
       {
